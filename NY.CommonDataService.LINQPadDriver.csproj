@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWpf>true</UseWpf>
+    <AssemblyName>NY.CommonDataService.LINQPadDriver</AssemblyName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageTags>linqpad-driver</PackageTags>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Authors>Natraj Yegnaraman</Authors>
+    <Company>Natraj Yegnaraman</Company>
+    <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
+    <Product>LINQPad Driver for Dataverse</Product>    
+  </PropertyGroup>
+  <ItemGroup>
+    <None Update="CDSTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>CDSTemplate.cs</LastGenOutput>
+    </None>
+    <None Update="ConnectionDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="linqpad-samples\\*.*" />
+    <Folder Include="linqpad-samples\\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="LINQPad.Reference" Version="1.2.0-beta" />
+    <PackageReference Include="Microsoft.PowerPlatform.Cds.Client" Version="0.2.24-Alpha" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="CDSTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CDSTemplate.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <Target Name="PostBuild1" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /i/y/s &quot;$(TargetDir)*.*&quot; &quot;%25LocalAppData%25\\LINQPad\\Drivers\\DataContext\\NetCore\\$(TargetName)&quot;" />
+  </Target>
+</Project>

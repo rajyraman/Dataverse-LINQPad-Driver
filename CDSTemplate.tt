@@ -1,0 +1,173 @@
+﻿<#@ template language="C#" debug="true" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Microsoft.Xrm.Sdk" #>
+<#@ import namespace="Microsoft.Xrm.Sdk.Metadata" #>
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Runtime.Serialization;
+
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Metadata;
+using Microsoft.Xrm.Sdk.Client;
+using Microsoft.PowerPlatform.Cds.Client;
+
+[assembly: Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute()]
+
+namespace <#= this.Namespace #>
+{
+	<# foreach (var entity in Metadata)
+	{
+	#>
+		[System.Runtime.Serialization.DataContractAttribute()]
+		[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("<#=entity.LogicalName#>")]
+		public partial class <#=entity.SchemaName#> : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+		{
+	
+			public <#=entity.SchemaName#>() : 
+					base(EntityLogicalName)
+			{
+			}
+	
+			public const string EntityLogicalName = "<#=entity.LogicalName#>";
+			
+			public const string EntitySchemaName = "<#=entity.SchemaName#>";
+		
+			public const string PrimaryIdAttribute = "<#=entity.PrimaryIdAttribute#>";
+		
+			public const string PrimaryNameAttribute = "<#=(entity.PrimaryNameAttribute ?? "")#>";
+			
+			public const string EntityLogicalCollectionName = "<#=(entity.LogicalCollectionName ?? "")#>";
+	
+			public const int EntityTypeCode = <#=entity.ObjectTypeCode#>;
+	
+			public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+	
+			public event System.ComponentModel.PropertyChangingEventHandler PropertyChanging;
+	
+			private void OnPropertyChanged(string propertyName)
+			{
+				if ((this.PropertyChanged != null))
+				{
+					this.PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+				}
+			}
+	
+			private void OnPropertyChanging(string propertyName)
+			{
+				if ((this.PropertyChanging != null))
+				{
+					this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
+				}
+			}
+		<# foreach (var attribute in entity.Attributes.Where(x=>x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules))
+		{
+			var attributeType = GetTypeFromCode(attribute.AttributeType);
+			var attributeName = attribute.SchemaName == entity.SchemaName ? $"{attribute.SchemaName}1" : attribute.SchemaName;
+		#>
+			[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]		
+			public <#=attributeType#> <#=attributeName#>
+			{
+				get
+				{
+					return this.GetAttributeValue<<#=attributeType#>>("<#=attribute.LogicalName#>");
+				}
+				set
+				{
+					this.OnPropertyChanging("<#=attributeName#>");
+					this.SetAttributeValue("<#=attribute.LogicalName#>", value);
+					this.OnPropertyChanged("<#=attributeName#>");
+				}
+			}
+		<#}#>
+		}
+	<#}#>
+
+	public partial class <#= this.TypeName #> : OrganizationServiceContext
+	{
+		
+		[System.Diagnostics.DebuggerNonUserCode()]
+		public <#= this.TypeName #>(IOrganizationService client) : 
+				base(client)
+		{
+			this.CdsClient = (CdsServiceClient)client;
+		}
+		<# foreach (var entity in Metadata)
+		{
+		#>
+		public IQueryable<<#=entity.SchemaName#>> <#=entity.SchemaName#>
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<<#=entity.SchemaName#>>();
+			}
+		}
+		<#}#>
+
+		public CdsServiceClient CdsClient
+        {
+            get;
+            private set;
+        }
+	}
+}
+
+<#+
+public string Namespace { get; set; }
+
+public string TypeName { get; set; }
+#>
+
+<#+
+string GetTypeFromCode(AttributeTypeCode? attributeTypeCode)
+{
+	var attributeType = "object";
+	switch (attributeTypeCode)
+	{
+		case AttributeTypeCode.BigInt:
+		case AttributeTypeCode.Integer:	
+			attributeType = "int";
+			break;
+		case AttributeTypeCode.Boolean:
+			attributeType = "bool";
+			break;
+		case AttributeTypeCode.Customer:
+		case AttributeTypeCode.Lookup:	
+		case AttributeTypeCode.Owner:		
+			attributeType = "EntityReference";
+			break;
+		case AttributeTypeCode.DateTime:
+			attributeType = "DateTime";
+			break;
+		case AttributeTypeCode.Decimal:
+			attributeType = "decimal";
+			break;
+		case AttributeTypeCode.Double:
+			attributeType = "double";
+			break;
+		case AttributeTypeCode.EntityName:
+		case AttributeTypeCode.Memo:
+		case AttributeTypeCode.String:	
+			attributeType = "string";
+			break;
+		case AttributeTypeCode.Money:
+			attributeType = "Money";
+			break;
+		case AttributeTypeCode.Picklist:
+		case AttributeTypeCode.State:
+		case AttributeTypeCode.Status:
+			attributeType = "OptionSetValue";
+			break;
+		case AttributeTypeCode.Uniqueidentifier:
+			attributeType = "Guid";
+			break;
+	}
+	return attributeType;
+}
+#>
