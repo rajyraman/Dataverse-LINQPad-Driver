@@ -20,26 +20,11 @@ using Microsoft.PowerPlatform.Cds.Client;
 
 [assembly: Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute()]
 
-namespace <#= this.Namespace #>
+namespace <#=this.Namespace#>.Entities
 {
 	<#foreach (var entity in Metadata)
-	{
-	#>
-		<#foreach (var optionMetadata in entity.optionMetadata)
-		{
-		#>
-[System.Runtime.Serialization.DataContractAttribute()]
-			public enum <#=entity.entityMetadata.SchemaName#>_<#=optionMetadata.attributeName#>
-			{
-				<#foreach (var option in optionMetadata.options)
-				{
-				#>
-				[System.Runtime.Serialization.EnumMemberAttribute()]
-				<#=option.Label#> = <#=option.Value#>,
-				<#}#>
-			}			
-		<#}#>
-[System.Runtime.Serialization.DataContractAttribute()]
+	{#>
+		[System.Runtime.Serialization.DataContractAttribute()]
 		[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("<#=entity.entityMetadata.LogicalName#>")]
 		public partial class <#=entity.entityMetadata.SchemaName#> : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 		{
@@ -80,85 +65,106 @@ namespace <#= this.Namespace #>
 					this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 				}
 			}
-		<#foreach (var attribute in entity.entityMetadata.Attributes.Where(x=>x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules))
-		{
-			var attributeType = GetTypeFromCode(attribute.AttributeType);
-			var attributeName = attribute.SchemaName == entity.entityMetadata.SchemaName ? $"{attribute.SchemaName}1" : attribute.SchemaName;
-		#>
-			<#if(attribute.LogicalName == entity.entityMetadata.PrimaryIdAttribute) 
-			{#>
-				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
-				public System.Nullable<System.Guid> <#=attributeName#>
+			<#foreach (var attribute in entity.entityMetadata.Attributes.Where(x=>(!x.IsLogical.GetValueOrDefault() || x.IsRetrievable.GetValueOrDefault()) && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules))
+			{
+				var attributeType = GetTypeFromCode(attribute.AttributeType);
+				var attributeName = attribute.SchemaName == entity.entityMetadata.SchemaName ? $"{attribute.SchemaName}1" : attribute.SchemaName;
+			#>
+				<#if(attribute.LogicalName == entity.entityMetadata.PrimaryIdAttribute) 
+				{#>
+					[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
+					public System.Nullable<System.Guid> <#=attributeName#>
+					{
+						get
+						{
+							return this.GetAttributeValue<System.Nullable<System.Guid>>("<#=attribute.LogicalName#>");
+						}
+						set
+						{
+							this.OnPropertyChanging("<#=attributeName#>");
+							this.SetAttributeValue("<#=attribute.LogicalName#>", value);
+							if (value.HasValue)
+							{
+								base.Id = value.Value;
+							}
+							else
+							{
+								base.Id = System.Guid.Empty;
+							}
+							this.OnPropertyChanged("<#=attributeName#>");
+						}
+					}
+					[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
+					public override System.Guid Id
+					{
+						get
+						{
+							return base.Id;
+						}
+						set
+						{
+							this.<#=attributeName#> = value;
+						}
+					}
+				<#} else if(attributeType == "OptionSetValue") 
+				{
+				   var enumName = $"{entity.entityMetadata.SchemaName}_{attribute.SchemaName}";
+				#>
+					[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
+					public virtual <#=enumName#>? <#=attributeName#>
+					{
+						[System.Diagnostics.DebuggerNonUserCode()]
+						get
+						{
+							return (<#=enumName#>?)this.GetAttributeValue<OptionSetValue>("<#=attribute.LogicalName#>")?.Value;
+						}
+						[System.Diagnostics.DebuggerNonUserCode()]
+						set
+						{
+							this.OnPropertyChanging("<#=attributeName#>");
+							this.SetAttributeValue("<#=attribute.LogicalName#>", value.HasValue ? new OptionSetValue((int)value) : null);
+							this.OnPropertyChanged("<#=attributeName#>");
+						}
+					}
+				<#} else { #>
+				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]		
+				public <#=attributeType#> <#=attributeName#>
 				{
 					get
 					{
-						return this.GetAttributeValue<System.Nullable<System.Guid>>("<#=attribute.LogicalName#>");
+						return this.GetAttributeValue<<#=attributeType#>>("<#=attribute.LogicalName#>");
 					}
 					set
 					{
 						this.OnPropertyChanging("<#=attributeName#>");
 						this.SetAttributeValue("<#=attribute.LogicalName#>", value);
-						if (value.HasValue)
-						{
-							base.Id = value.Value;
-						}
-						else
-						{
-							base.Id = System.Guid.Empty;
-						}
 						this.OnPropertyChanged("<#=attributeName#>");
 					}
 				}
-				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
-				public override System.Guid Id
-				{
-					get
-					{
-						return base.Id;
-					}
-					set
-					{
-						this.<#=attributeName#> = value;
-					}
-				}
-			<#} else if(attributeType == "OptionSetValue") 
-			{
-			   var enumName = $"{entity.entityMetadata.SchemaName}_{attribute.SchemaName}";
-			#>
-				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
-				public virtual <#=enumName#>? <#=attributeName#>
-				{
-					[System.Diagnostics.DebuggerNonUserCode()]
-					get
-					{
-						return (<#=enumName#>?)this.GetAttributeValue<OptionSetValue>("<#=attribute.LogicalName#>")?.Value;
-					}
-					[System.Diagnostics.DebuggerNonUserCode()]
-					set
-					{
-						this.OnPropertyChanging("<#=attributeName#>");
-						this.SetAttributeValue("<#=attribute.LogicalName#>", value.HasValue ? new OptionSetValue((int)value) : null);
-						this.OnPropertyChanged("<#=attributeName#>");
-					}
-				}
-			<#} else { #>
-			[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]		
-			public <#=attributeType#> <#=attributeName#>
-			{
-				get
-				{
-					return this.GetAttributeValue<<#=attributeType#>>("<#=attribute.LogicalName#>");
-				}
-				set
-				{
-					this.OnPropertyChanging("<#=attributeName#>");
-					this.SetAttributeValue("<#=attribute.LogicalName#>", value);
-					this.OnPropertyChanged("<#=attributeName#>");
-				}
-			}
+				<#}#>
 			<#}#>
-		<#}#>
 		}
+	<#}#>
+}
+
+namespace <#= this.Namespace #>
+{
+	using Entities; 
+	<#foreach (var entity in Metadata)
+	{#>
+		<#foreach (var optionMetadata in entity.optionMetadata)
+		{#>
+			[System.Runtime.Serialization.DataContractAttribute()]
+			public enum <#=entity.entityMetadata.SchemaName#>_<#=optionMetadata.attributeName#>
+			{
+				<#foreach (var option in optionMetadata.options)
+				{
+				#>
+					[System.Runtime.Serialization.EnumMemberAttribute()]
+					<#=option.Label#> = <#=option.Value#>,
+				<#}#>
+			}			
+		<#}#>
 	<#}#>
 
 	public partial class <#= this.TypeName #> : OrganizationServiceContext
@@ -208,6 +214,7 @@ string GetTypeFromCode(AttributeTypeCode? attributeTypeCode)
 			attributeType = "int";
 			break;
 		case AttributeTypeCode.Boolean:
+		case AttributeTypeCode.ManagedProperty:
 			attributeType = "bool";
 			break;
 		case AttributeTypeCode.Customer:

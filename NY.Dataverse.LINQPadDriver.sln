@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NY.CommonDataService.LINQPadDriver", "NY.CommonDataService.LINQPadDriver.csproj", "{1AEC13A1-A7A0-4E31-8C55-E9E0A2C54511}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NY.Dataverse.LINQPadDriver", "NY.Dataverse.LINQPadDriver.csproj", "{1AEC13A1-A7A0-4E31-8C55-E9E0A2C54511}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

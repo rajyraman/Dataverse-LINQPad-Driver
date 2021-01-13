@@ -2,16 +2,18 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWpf>true</UseWpf>
-    <AssemblyName>NY.CommonDataService.LINQPadDriver</AssemblyName>
+    <AssemblyName>NY.Dataverse.LINQPadDriver</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageTags>linqpad-driver</PackageTags>
+    <PackageTags>linqpad-driver,linqpaddriver</PackageTags>
     <Version>1.0.0</Version>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Authors>Natraj Yegnaraman</Authors>
     <Company>Natraj Yegnaraman</Company>
     <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
-    <Product>LINQPad Driver for Dataverse</Product>    
+    <Product>LINQPad Driver for Dataverse</Product>
+    <Description>This driver helps you connect to Dataverse (CDS) API and query or execute actions against the API. This driver utilises the .net core CDS assemblies to generate the early bound classes.</Description>
+    <RootNamespace>NY.Dataverse.LINQPadDriver</RootNamespace>    
   </PropertyGroup>
   <ItemGroup>
     <None Update="CDSTemplate.tt">
@@ -24,6 +26,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="linqpad-samples\\*.*" />
+    <Content Remove="linqpad-samples\Entity Created Information.linq" />
+    <Content Remove="linqpad-samples\Plugins by Message.linq" />
+    <Content Remove="linqpad-samples\User Settings.linq" />
+    <None Remove="linqpad-samples\Entity Created Information.linq" />
+    <None Remove="linqpad-samples\Plugins by Message.linq" />
+    <None Remove="linqpad-samples\User Settings.linq" />
+    <Folder Include="linqpad-samples\" />
     <Folder Include="linqpad-samples\\" />
   </ItemGroup>
   <ItemGroup>
@@ -40,7 +49,7 @@
       <DependentUpon>CDSTemplate.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-  <Target Name="PostBuild1" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /i/y/s &quot;$(TargetDir)*.*&quot; &quot;%25LocalAppData%25\\LINQPad\\Drivers\\DataContext\\NetCore\\$(TargetName)&quot;" />
-  </Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /i/y/s &quot;$(TargetDir)*.*&quot; &quot;%25LocalAppData%25\LINQPad\Drivers\DataContext\NetCore\$(TargetName)&quot;" />
+  </Target>  
 </Project>

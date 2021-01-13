@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace NY.CommonDataService.LINQPadDriver
+namespace NY.Dataverse.LINQPadDriver
 {
     public class EnumToBooleanConverter : IValueConverter
     {

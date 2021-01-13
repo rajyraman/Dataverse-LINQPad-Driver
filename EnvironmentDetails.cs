@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NY.CommonDataService.LINQPadDriver
+namespace NY.Dataverse.LINQPadDriver
 {
     public class EnvironmentDetails
     {

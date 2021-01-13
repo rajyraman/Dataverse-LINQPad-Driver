@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-namespace NY.CommonDataService.LINQPadDriver
+namespace NY.Dataverse.LINQPadDriver
 {
     partial class CDSTemplate
     {

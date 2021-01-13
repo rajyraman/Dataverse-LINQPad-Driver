@@ -15,7 +15,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-namespace NY.CommonDataService.LINQPadDriver
+namespace NY.Dataverse.LINQPadDriver
 {
 	public class DynamicDriver : DynamicDataContextDriver
 	{
@@ -29,7 +29,7 @@ namespace NY.CommonDataService.LINQPadDriver
 			// Uncomment the following code to attach to Visual Studio's debugger when an exception is thrown:
 			AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
 			{
-				if (args.Exception.StackTrace.Contains("NY.CommonDataService.LINQPadDriver"))
+				if (args.Exception.StackTrace.Contains("NY.Dataverse.LINQPadDriver"))
 					Debugger.Launch();
 			};
 		}
