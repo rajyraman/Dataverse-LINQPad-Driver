@@ -2,6 +2,7 @@
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="Microsoft.Xrm.Sdk" #>
 <#@ import namespace="Microsoft.Xrm.Sdk.Metadata" #>
@@ -21,30 +22,44 @@ using Microsoft.PowerPlatform.Cds.Client;
 
 namespace <#= this.Namespace #>
 {
-	<# foreach (var entity in Metadata)
+	<#foreach (var entity in Metadata)
 	{
 	#>
-		[System.Runtime.Serialization.DataContractAttribute()]
-		[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("<#=entity.LogicalName#>")]
-		public partial class <#=entity.SchemaName#> : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+		<#foreach (var optionMetadata in entity.optionMetadata)
+		{
+		#>
+[System.Runtime.Serialization.DataContractAttribute()]
+			public enum <#=entity.entityMetadata.SchemaName#>_<#=optionMetadata.attributeName#>
+			{
+				<#foreach (var option in optionMetadata.options)
+				{
+				#>
+				[System.Runtime.Serialization.EnumMemberAttribute()]
+				<#=option.Label#> = <#=option.Value#>,
+				<#}#>
+			}			
+		<#}#>
+[System.Runtime.Serialization.DataContractAttribute()]
+		[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("<#=entity.entityMetadata.LogicalName#>")]
+		public partial class <#=entity.entityMetadata.SchemaName#> : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 		{
 	
-			public <#=entity.SchemaName#>() : 
+			public <#=entity.entityMetadata.SchemaName#>() : 
 					base(EntityLogicalName)
 			{
 			}
 	
-			public const string EntityLogicalName = "<#=entity.LogicalName#>";
+			public const string EntityLogicalName = "<#=entity.entityMetadata.LogicalName#>";
 			
-			public const string EntitySchemaName = "<#=entity.SchemaName#>";
+			public const string EntitySchemaName = "<#=entity.entityMetadata.SchemaName#>";
 		
-			public const string PrimaryIdAttribute = "<#=entity.PrimaryIdAttribute#>";
+			public const string PrimaryIdAttribute = "<#=entity.entityMetadata.PrimaryIdAttribute#>";
 		
-			public const string PrimaryNameAttribute = "<#=(entity.PrimaryNameAttribute ?? "")#>";
+			public const string PrimaryNameAttribute = "<#=(entity.entityMetadata.PrimaryNameAttribute ?? "")#>";
 			
-			public const string EntityLogicalCollectionName = "<#=(entity.LogicalCollectionName ?? "")#>";
+			public const string EntityLogicalCollectionName = "<#=(entity.entityMetadata.LogicalCollectionName ?? "")#>";
 	
-			public const int EntityTypeCode = <#=entity.ObjectTypeCode#>;
+			public const int EntityTypeCode = <#=entity.entityMetadata.ObjectTypeCode#>;
 	
 			public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 	
@@ -65,11 +80,68 @@ namespace <#= this.Namespace #>
 					this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 				}
 			}
-		<# foreach (var attribute in entity.Attributes.Where(x=>x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules))
+		<#foreach (var attribute in entity.entityMetadata.Attributes.Where(x=>x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules))
 		{
 			var attributeType = GetTypeFromCode(attribute.AttributeType);
-			var attributeName = attribute.SchemaName == entity.SchemaName ? $"{attribute.SchemaName}1" : attribute.SchemaName;
+			var attributeName = attribute.SchemaName == entity.entityMetadata.SchemaName ? $"{attribute.SchemaName}1" : attribute.SchemaName;
 		#>
+			<#if(attribute.LogicalName == entity.entityMetadata.PrimaryIdAttribute) 
+			{#>
+				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
+				public System.Nullable<System.Guid> <#=attributeName#>
+				{
+					get
+					{
+						return this.GetAttributeValue<System.Nullable<System.Guid>>("<#=attribute.LogicalName#>");
+					}
+					set
+					{
+						this.OnPropertyChanging("<#=attributeName#>");
+						this.SetAttributeValue("<#=attribute.LogicalName#>", value);
+						if (value.HasValue)
+						{
+							base.Id = value.Value;
+						}
+						else
+						{
+							base.Id = System.Guid.Empty;
+						}
+						this.OnPropertyChanged("<#=attributeName#>");
+					}
+				}
+				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
+				public override System.Guid Id
+				{
+					get
+					{
+						return base.Id;
+					}
+					set
+					{
+						this.<#=attributeName#> = value;
+					}
+				}
+			<#} else if(attributeType == "OptionSetValue") 
+			{
+			   var enumName = $"{entity.entityMetadata.SchemaName}_{attribute.SchemaName}";
+			#>
+				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
+				public virtual <#=enumName#>? <#=attributeName#>
+				{
+					[System.Diagnostics.DebuggerNonUserCode()]
+					get
+					{
+						return (<#=enumName#>?)this.GetAttributeValue<OptionSetValue>("<#=attribute.LogicalName#>")?.Value;
+					}
+					[System.Diagnostics.DebuggerNonUserCode()]
+					set
+					{
+						this.OnPropertyChanging("<#=attributeName#>");
+						this.SetAttributeValue("<#=attribute.LogicalName#>", value.HasValue ? new OptionSetValue((int)value) : null);
+						this.OnPropertyChanged("<#=attributeName#>");
+					}
+				}
+			<#} else { #>
 			[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]		
 			public <#=attributeType#> <#=attributeName#>
 			{
@@ -84,6 +156,7 @@ namespace <#= this.Namespace #>
 					this.OnPropertyChanged("<#=attributeName#>");
 				}
 			}
+			<#}#>
 		<#}#>
 		}
 	<#}#>
@@ -95,22 +168,22 @@ namespace <#= this.Namespace #>
 		public <#= this.TypeName #>(IOrganizationService client) : 
 				base(client)
 		{
-			this.CdsClient = (CdsServiceClient)client;
+			this.DataverseClient = (CdsServiceClient)client;
 		}
 		<# foreach (var entity in Metadata)
 		{
 		#>
-		public IQueryable<<#=entity.SchemaName#>> <#=entity.SchemaName#>
+		public IQueryable<<#=entity.entityMetadata.SchemaName#>> <#=entity.entityMetadata.SchemaName#>
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get
 			{
-				return this.CreateQuery<<#=entity.SchemaName#>>();
+				return this.CreateQuery<<#=entity.entityMetadata.SchemaName#>>();
 			}
 		}
 		<#}#>
 
-		public CdsServiceClient CdsClient
+		public CdsServiceClient DataverseClient
         {
             get;
             private set;

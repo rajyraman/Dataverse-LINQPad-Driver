@@ -11,6 +11,7 @@ namespace NY.CommonDataService.LINQPadDriver
 {
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Collections.Generic;
     using Microsoft.Xrm.Sdk;
     using Microsoft.Xrm.Sdk.Metadata;
@@ -46,83 +47,143 @@ using Microsoft.PowerPlatform.Cds.Client;
 
 namespace ");
             
-            #line 22 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 23 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Namespace));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n\t");
             
-            #line 24 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
- foreach (var entity in Metadata)
+            #line 25 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+foreach (var entity in Metadata)
 	{
 	
             
             #line default
             #line hidden
-            this.Write("\t\t[System.Runtime.Serialization.DataContractAttribute()]\r\n\t\t[Microsoft.Xrm.Sdk.Cl" +
-                    "ient.EntityLogicalNameAttribute(\"");
+            this.Write("\t\t");
             
             #line 28 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.LogicalName));
+foreach (var optionMetadata in entity.optionMetadata)
+		{
+		
+            
+            #line default
+            #line hidden
+            this.Write("[System.Runtime.Serialization.DataContractAttribute()]\r\n\t\t\tpublic enum ");
+            
+            #line 32 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
+            
+            #line default
+            #line hidden
+            this.Write("_");
+            
+            #line 32 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(optionMetadata.attributeName));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t\t\t{\r\n\t\t\t\t");
+            
+            #line 34 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+foreach (var option in optionMetadata.options)
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t[System.Runtime.Serialization.EnumMemberAttribute()]\r\n\t\t\t\t");
+            
+            #line 38 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(option.Label));
+            
+            #line default
+            #line hidden
+            this.Write(" = ");
+            
+            #line 38 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(option.Value));
+            
+            #line default
+            #line hidden
+            this.Write(",\r\n\t\t\t\t");
+            
+            #line 39 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t}\t\t\t\r\n\t\t");
+            
+            #line 41 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("[System.Runtime.Serialization.DataContractAttribute()]\r\n\t\t[Microsoft.Xrm.Sdk.Clie" +
+                    "nt.EntityLogicalNameAttribute(\"");
+            
+            #line 43 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.LogicalName));
             
             #line default
             #line hidden
             this.Write("\")]\r\n\t\tpublic partial class ");
             
-            #line 29 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.SchemaName));
+            #line 44 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
             #line hidden
             this.Write(" : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, Syste" +
                     "m.ComponentModel.INotifyPropertyChanged\r\n\t\t{\r\n\t\r\n\t\t\tpublic ");
             
-            #line 32 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.SchemaName));
+            #line 47 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
             #line hidden
             this.Write("() : \r\n\t\t\t\t\tbase(EntityLogicalName)\r\n\t\t\t{\r\n\t\t\t}\r\n\t\r\n\t\t\tpublic const string Entity" +
                     "LogicalName = \"");
             
-            #line 37 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.LogicalName));
+            #line 52 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.LogicalName));
             
             #line default
             #line hidden
             this.Write("\";\r\n\t\t\t\r\n\t\t\tpublic const string EntitySchemaName = \"");
             
-            #line 39 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.SchemaName));
+            #line 54 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
             #line hidden
             this.Write("\";\r\n\t\t\r\n\t\t\tpublic const string PrimaryIdAttribute = \"");
             
-            #line 41 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.PrimaryIdAttribute));
+            #line 56 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.PrimaryIdAttribute));
             
             #line default
             #line hidden
             this.Write("\";\r\n\t\t\r\n\t\t\tpublic const string PrimaryNameAttribute = \"");
             
-            #line 43 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture((entity.PrimaryNameAttribute ?? "")));
+            #line 58 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture((entity.entityMetadata.PrimaryNameAttribute ?? "")));
             
             #line default
             #line hidden
             this.Write("\";\r\n\t\t\t\r\n\t\t\tpublic const string EntityLogicalCollectionName = \"");
             
-            #line 45 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture((entity.LogicalCollectionName ?? "")));
+            #line 60 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture((entity.entityMetadata.LogicalCollectionName ?? "")));
             
             #line default
             #line hidden
             this.Write("\";\r\n\t\r\n\t\t\tpublic const int EntityTypeCode = ");
             
-            #line 47 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.ObjectTypeCode));
+            #line 62 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.ObjectTypeCode));
             
             #line default
             #line hidden
@@ -149,88 +210,239 @@ namespace ");
 			}
 		");
             
-            #line 68 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
- foreach (var attribute in entity.Attributes.Where(x=>x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules))
+            #line 83 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+foreach (var attribute in entity.entityMetadata.Attributes.Where(x=>x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules))
 		{
 			var attributeType = GetTypeFromCode(attribute.AttributeType);
-			var attributeName = attribute.SchemaName == entity.SchemaName ? $"{attribute.SchemaName}1" : attribute.SchemaName;
+			var attributeName = attribute.SchemaName == entity.entityMetadata.SchemaName ? $"{attribute.SchemaName}1" : attribute.SchemaName;
 		
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t");
+            
+            #line 88 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+if(attribute.LogicalName == entity.entityMetadata.PrimaryIdAttribute) 
+			{
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t[AttributeLogicalNameAttribute(\"");
+            
+            #line 90 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\")]\r\n\t\t\t\tpublic System.Nullable<System.Guid> ");
+            
+            #line 91 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t\t\t\t{\r\n\t\t\t\t\tget\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\treturn this.GetAttributeValue<System.Nullable<Sy" +
+                    "stem.Guid>>(\"");
+            
+            #line 95 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\");\r\n\t\t\t\t\t}\r\n\t\t\t\t\tset\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tthis.OnPropertyChanging(\"");
+            
+            #line 99 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
+            
+            #line default
+            #line hidden
+            this.Write("\");\r\n\t\t\t\t\t\tthis.SetAttributeValue(\"");
+            
+            #line 100 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\", value);\r\n\t\t\t\t\t\tif (value.HasValue)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tbase.Id = value.Value;\r\n\t\t" +
+                    "\t\t\t\t}\r\n\t\t\t\t\t\telse\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tbase.Id = System.Guid.Empty;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\t" +
+                    "this.OnPropertyChanged(\"");
+            
+            #line 109 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
+            
+            #line default
+            #line hidden
+            this.Write("\");\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\t[AttributeLogicalNameAttribute(\"");
+            
+            #line 112 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\")]\r\n\t\t\t\tpublic override System.Guid Id\r\n\t\t\t\t{\r\n\t\t\t\t\tget\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\treturn ba" +
+                    "se.Id;\r\n\t\t\t\t\t}\r\n\t\t\t\t\tset\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tthis.");
+            
+            #line 121 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
+            
+            #line default
+            #line hidden
+            this.Write(" = value;\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t");
+            
+            #line 124 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+} else if(attributeType == "OptionSetValue") 
+			{
+			   var enumName = $"{entity.entityMetadata.SchemaName}_{attribute.SchemaName}";
+			
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t[AttributeLogicalNameAttribute(\"");
+            
+            #line 128 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\")]\r\n\t\t\t\tpublic virtual ");
+            
+            #line 129 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(enumName));
+            
+            #line default
+            #line hidden
+            this.Write("? ");
+            
+            #line 129 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t\t\t\t{\r\n\t\t\t\t\t[System.Diagnostics.DebuggerNonUserCode()]\r\n\t\t\t\t\tget\r\n\t\t\t\t\t{\r\n\t\t\t\t\t" +
+                    "\treturn (");
+            
+            #line 134 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(enumName));
+            
+            #line default
+            #line hidden
+            this.Write("?)this.GetAttributeValue<OptionSetValue>(\"");
+            
+            #line 134 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\")?.Value;\r\n\t\t\t\t\t}\r\n\t\t\t\t\t[System.Diagnostics.DebuggerNonUserCode()]\r\n\t\t\t\t\tset\r\n\t\t" +
+                    "\t\t\t{\r\n\t\t\t\t\t\tthis.OnPropertyChanging(\"");
+            
+            #line 139 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
+            
+            #line default
+            #line hidden
+            this.Write("\");\r\n\t\t\t\t\t\tthis.SetAttributeValue(\"");
+            
+            #line 140 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\", value.HasValue ? new OptionSetValue((int)value) : null);\r\n\t\t\t\t\t\tthis.OnPropert" +
+                    "yChanged(\"");
+            
+            #line 141 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
+            
+            #line default
+            #line hidden
+            this.Write("\");\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t");
+            
+            #line 144 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+} else { 
             
             #line default
             #line hidden
             this.Write("\t\t\t[AttributeLogicalNameAttribute(\"");
             
-            #line 73 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 145 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
             
             #line default
             #line hidden
             this.Write("\")]\t\t\r\n\t\t\tpublic ");
             
-            #line 74 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 146 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attributeType));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 74 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 146 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
             
             #line default
             #line hidden
             this.Write("\r\n\t\t\t{\r\n\t\t\t\tget\r\n\t\t\t\t{\r\n\t\t\t\t\treturn this.GetAttributeValue<");
             
-            #line 78 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 150 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attributeType));
             
             #line default
             #line hidden
             this.Write(">(\"");
             
-            #line 78 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 150 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
             
             #line default
             #line hidden
             this.Write("\");\r\n\t\t\t\t}\r\n\t\t\t\tset\r\n\t\t\t\t{\r\n\t\t\t\t\tthis.OnPropertyChanging(\"");
             
-            #line 82 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 154 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
             
             #line default
             #line hidden
             this.Write("\");\r\n\t\t\t\t\tthis.SetAttributeValue(\"");
             
-            #line 83 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 155 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
             
             #line default
             #line hidden
             this.Write("\", value);\r\n\t\t\t\t\tthis.OnPropertyChanged(\"");
             
-            #line 84 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 156 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
             
             #line default
             #line hidden
-            this.Write("\");\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t");
+            this.Write("\");\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\t");
             
-            #line 87 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 159 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("\t\t");
+            
+            #line 160 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("\t\t}\r\n\t");
             
-            #line 89 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 162 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("\r\n\tpublic partial class ");
             
-            #line 91 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 164 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.TypeName));
             
             #line default
@@ -238,15 +450,15 @@ namespace ");
             this.Write(" : OrganizationServiceContext\r\n\t{\r\n\t\t\r\n\t\t[System.Diagnostics.DebuggerNonUserCode(" +
                     ")]\r\n\t\tpublic ");
             
-            #line 95 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 168 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.TypeName));
             
             #line default
             #line hidden
-            this.Write("(IOrganizationService client) : \r\n\t\t\t\tbase(client)\r\n\t\t{\r\n\t\t\tthis.CdsClient = (Cds" +
-                    "ServiceClient)client;\r\n\t\t}\r\n\t\t");
+            this.Write("(IOrganizationService client) : \r\n\t\t\t\tbase(client)\r\n\t\t{\r\n\t\t\tthis.DataverseClient " +
+                    "= (CdsServiceClient)client;\r\n\t\t}\r\n\t\t");
             
-            #line 100 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 173 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
  foreach (var entity in Metadata)
 		{
 		
@@ -255,39 +467,39 @@ namespace ");
             #line hidden
             this.Write("\t\tpublic IQueryable<");
             
-            #line 103 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.SchemaName));
+            #line 176 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
             #line hidden
             this.Write("> ");
             
-            #line 103 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.SchemaName));
+            #line 176 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
             #line hidden
             this.Write("\r\n\t\t{\r\n\t\t\t[System.Diagnostics.DebuggerNonUserCode()]\r\n\t\t\tget\r\n\t\t\t{\r\n\t\t\t\treturn th" +
                     "is.CreateQuery<");
             
-            #line 108 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entity.SchemaName));
+            #line 181 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
             #line hidden
             this.Write(">();\r\n\t\t\t}\r\n\t\t}\r\n\t\t");
             
-            #line 111 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+            #line 184 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
 }
             
             #line default
             #line hidden
-            this.Write("\r\n\t\tpublic CdsServiceClient CdsClient\r\n        {\r\n            get;\r\n            p" +
-                    "rivate set;\r\n        }\r\n\t}\r\n}\r\n\r\n");
+            this.Write("\r\n\t\tpublic CdsServiceClient DataverseClient\r\n        {\r\n            get;\r\n       " +
+                    "     private set;\r\n        }\r\n\t}\r\n}\r\n\r\n");
             return this.GenerationEnvironment.ToString();
         }
         
-        #line 121 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+        #line 194 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
 
 public string Namespace { get; set; }
 
@@ -297,7 +509,7 @@ public string TypeName { get; set; }
         #line default
         #line hidden
         
-        #line 127 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
+        #line 200 "D:\GitHub\LINQPad-CDS-DriverNY.CommonDataService.LINQPadDriver\CDSTemplate.tt"
 
 string GetTypeFromCode(AttributeTypeCode? attributeTypeCode)
 {

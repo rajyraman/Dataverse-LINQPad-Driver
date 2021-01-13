@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace NY.CommonDataService.LINQPadDriver
@@ -61,7 +62,27 @@ namespace NY.CommonDataService.LINQPadDriver
 			var client = new CdsServiceClient(connectionProperties.ConnectionString);
 			if (client.IsReady)
 			{
-				var entityMetadata = client.GetAllEntityMetadata(filter: EntityFilters.Attributes | EntityFilters.Entity | EntityFilters.Relationships).Where(x => x.IsPrivate == false).OrderBy(x=>x.LogicalName).ToList();
+				var entityMetadata = (from e in client.GetAllEntityMetadata(filter: EntityFilters.Attributes | EntityFilters.Entity | EntityFilters.Relationships)
+									  where e.IsPrivate == false
+									  orderby e.LogicalName
+									  select (entityMetadata: e, optionMetadata: (from attribute in e.Attributes
+																		   where attribute.AttributeType == AttributeTypeCode.State || attribute.AttributeType == AttributeTypeCode.Status || attribute.AttributeType == AttributeTypeCode.Picklist
+																		   orderby attribute.LogicalName
+																		   select (attributeName: attribute.SchemaName, options: ((EnumAttributeMetadata)attribute).OptionSet.Options.Select(x => {
+																			   var allOptions = ((EnumAttributeMetadata)attribute).OptionSet.Options;
+																			   var enumValue = string.Join("_", x.Label.UserLocalizedLabel.Label.Split(" "));
+																			   enumValue = new Regex("[^a-zA-Z0-9_]").Replace(enumValue, "");
+																			   if (string.IsNullOrEmpty(enumValue))
+																			   {
+																				   enumValue = $"_{x.Value}";
+																			   }
+																			   else if (IsCSharpKeyword(enumValue) || char.IsDigit(enumValue[0]) || allOptions.Count(o => o.Label.UserLocalizedLabel.Label == x.Label.UserLocalizedLabel.Label) > 1)
+																			   {
+																				   enumValue = $"_{enumValue}_{x.Value}";
+																			   }
+																			   return (Label: enumValue, x.Value);
+																		   }).ToList())).ToList()
+									  )).ToList();
 				var code = new CDSTemplate(entityMetadata) { Namespace = nameSpace, TypeName = typeName }.TransformText();
 #if DEBUG
 				File.WriteAllText(Path.Combine(GetContentFolder(), "LINQPad.EarlyBound.cs"), code);
@@ -69,7 +90,7 @@ namespace NY.CommonDataService.LINQPadDriver
 				Compile(code, assemblyToBuild.CodeBase, cxInfo);
 				foreach (var entity in entityMetadata)
 				{
-					var attributes = entity.Attributes
+					var attributes = entity.entityMetadata.Attributes
 					.Where(x => x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules)
 					.OrderBy(x => x.LogicalName)
 					.Select(a => new ExplorerItem($"{a.SchemaName} ({a.AttributeType})", ExplorerItemKind.Parameter, ExplorerIcon.Column)
@@ -77,19 +98,19 @@ namespace NY.CommonDataService.LINQPadDriver
 						Icon = a.IsPrimaryId == true ? ExplorerIcon.Key : ExplorerIcon.Column,
 						Tag = a.LogicalName
 					}).ToList();
-					ExplorerItem item = new ExplorerItem(entity.SchemaName, ExplorerItemKind.QueryableObject, ExplorerIcon.Table)
+					ExplorerItem item = new ExplorerItem(entity.entityMetadata.SchemaName, ExplorerItemKind.QueryableObject, ExplorerIcon.Table)
 					{
 						IsEnumerable = true,
 						Children = attributes,
-						Tag = entity.LogicalName
+						Tag = entity.entityMetadata.LogicalName
 					};
 					explorerItems.Add(item);
 				}
 
 				foreach (var entity in entityMetadata)
 				{
-					var source = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == entity.LogicalName);
-					foreach (var oneToMany in entity.OneToManyRelationships)
+					var source = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == entity.entityMetadata.LogicalName);
+					foreach (var oneToMany in entity.entityMetadata.OneToManyRelationships)
 					{
 						var target = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == oneToMany.ReferencingEntity);
 						if (target != null)
@@ -102,7 +123,7 @@ namespace NY.CommonDataService.LINQPadDriver
 						}
 					}
 
-					foreach (var manyToOne in entity.ManyToOneRelationships)
+					foreach (var manyToOne in entity.entityMetadata.ManyToOneRelationships)
 					{
 						var targetEntity = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == manyToOne.ReferencedEntity);
 						var targetAttribute = targetEntity?.Children.FirstOrDefault(e => e.Kind == ExplorerItemKind.Parameter && (string)e.Tag == manyToOne.ReferencedAttribute);

@@ -8,8 +8,8 @@ namespace NY.CommonDataService.LINQPadDriver
 {
     partial class CDSTemplate
     {
-        public CDSTemplate(List<EntityMetadata> metadata) => Metadata = metadata;
+        public CDSTemplate(List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> metadata) => Metadata = metadata;
 
-        public List<EntityMetadata> Metadata { get; private set; }
+        public List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> Metadata { get; private set; }
     }
 }
