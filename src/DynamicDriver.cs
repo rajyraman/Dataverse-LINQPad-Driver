@@ -21,7 +21,6 @@ namespace NY.Dataverse.LINQPadDriver
 	{
 		static DynamicDriver _driverInstance;
 		static CdsServiceClient _cdsClient;
-		static XElement _fetchXml;
 
 #if DEBUG
 		static DynamicDriver()
@@ -33,7 +32,7 @@ namespace NY.Dataverse.LINQPadDriver
 					Debugger.Launch();
 			};
 		}
-#endif   
+#endif
 		public override string Name => "Dataverse LINQPad Driver";
 
 		public override string Author => "Natraj Yegnaraman";

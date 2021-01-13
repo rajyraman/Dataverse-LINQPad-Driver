@@ -4,7 +4,7 @@
     <UseWpf>true</UseWpf>
     <AssemblyName>NY.Dataverse.LINQPadDriver</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageTags>linqpad-driver,linqpaddriver</PackageTags>
+    <PackageTags>dataverse,linqpaddriver,commondataservice,powerapps,dynamics365</PackageTags>
     <Version>1.0.0</Version>
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
@@ -12,8 +12,18 @@
     <Company>Natraj Yegnaraman</Company>
     <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
     <Product>LINQPad Driver for Dataverse</Product>
-    <Description>This driver helps you connect to Dataverse (CDS) API and query or execute actions against the API. This driver utilises the .net core CDS assemblies to generate the early bound classes.</Description>
-    <RootNamespace>NY.Dataverse.LINQPadDriver</RootNamespace>    
+    <Description>This driver helps you connect to Dataverse (CDS) API and query or execute actions against the API. This driver utilises the .net core CDS assemblies to generate the early bound classes. Only Client Secret and Certificate Thumbprint are supported authentication mechanisms, as of Jan 2021.</Description>
+    <RootNamespace>NY.Dataverse.LINQPadDriver</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>NY.Dataverse.LINQPadDriver.snk</AssemblyOriginatorKeyFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Initial release, which uses Microsoft.PowerPlatform.Cds.Client 0.2.24-Alpha for connecting with Dataverse.</PackageReleaseNotes>
+    <PackageIcon>LINQPadDriver.png</PackageIcon>
+    <PackageIconUrl />
+    <Copyright>Natraj Yegnaraman</Copyright>    
   </PropertyGroup>
   <ItemGroup>
     <None Update="CDSTemplate.tt">
@@ -23,17 +33,24 @@
     <None Update="ConnectionDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
+    <None Include="..\images\LINQPadDriver.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="linqpad-samples\\*.*" />
-    <Content Remove="linqpad-samples\Entity Created Information.linq" />
-    <Content Remove="linqpad-samples\Plugins by Message.linq" />
-    <Content Remove="linqpad-samples\User Settings.linq" />
     <None Remove="linqpad-samples\Entity Created Information.linq" />
+    <None Remove="linqpad-samples\PCF Components.linq" />
     <None Remove="linqpad-samples\Plugins by Message.linq" />
+    <None Remove="linqpad-samples\Required Attributes.linq" />
     <None Remove="linqpad-samples\User Settings.linq" />
-    <Folder Include="linqpad-samples\" />
-    <Folder Include="linqpad-samples\\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="linqpad-samples\Entity Created Information.linq" />
+    <Content Include="linqpad-samples\PCF Components.linq" />
+    <Content Include="linqpad-samples\Plugins by Message.linq" />
+    <Content Include="linqpad-samples\Required Attributes.linq" />
+    <Content Include="linqpad-samples\User Settings.linq" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LINQPad.Reference" Version="1.2.0-beta" />

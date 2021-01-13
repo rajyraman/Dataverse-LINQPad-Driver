@@ -15,7 +15,7 @@
   <Namespace>Microsoft.Xrm.Sdk.Metadata</Namespace>
 </Query>
 
-(from s in SavedQuery
-where s.QueryType == 0 && s.ReturnedTypeCode != "account"
-orderby s.CreatedOn
-select new { EntityName = s.ReturnedTypeCode, CreatedBy = s.CreatedBy.Name, CreatedOn = s.CreatedOn.ToLocalTime()  }).Take(1)
+from a in this.DataverseClient.GetAllAttributesForEntity(LINQPad.User.Entities.Account.EntityLogicalName)
+where a.RequiredLevel.Value != AttributeRequiredLevel.SystemRequired
+orderby a.LogicalName
+select new {a.LogicalName, a.SchemaName, a.AttributeType}
