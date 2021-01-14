@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWpf>true</UseWpf>
     <AssemblyName>NY.Dataverse.LINQPadDriver</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LINQPad.Reference" Version="1.2.0-beta" />
-    <PackageReference Include="Microsoft.PowerPlatform.Cds.Client" Version="0.2.24-Alpha" />
+    <PackageReference Include="Microsoft.PowerPlatform.Cds.Client" Version="0.3.6-Alpha" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />

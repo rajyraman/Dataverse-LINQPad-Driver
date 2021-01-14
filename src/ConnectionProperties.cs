@@ -72,6 +72,11 @@ namespace NY.Dataverse.LINQPadDriver
 			get => (AuthenticationType?)(int?)DriverData.Element("AuthenticationType") ?? AuthenticationType.ClientSecret;
 			set => DriverData.SetElementValue("AuthenticationType", (int)value);
 		}
+		public string ConnectionName
+		{
+			get => (string)DriverData.Element("ConnectionName") ?? "";
+			set => DriverData.SetElementValue("ConnectionName", value);
+		}
 
 		public CdsServiceClient GetCdsClient()
 		{

@@ -36,7 +36,11 @@ namespace NY.Dataverse.LINQPadDriver
 		public override string Name => "Dataverse LINQPad Driver";
 
 		public override string Author => "Natraj Yegnaraman";
-		public override string GetConnectionDescription(IConnectionInfo connectionInfo) => new ConnectionProperties(connectionInfo).EnvironmentUrl;
+        public override string GetConnectionDescription(IConnectionInfo connectionInfo) 
+        {
+            var connectionProperties = new ConnectionProperties(connectionInfo);
+            return $"{connectionProperties.ConnectionName} ({connectionProperties.EnvironmentUrl})";
+        }
 
 		public override bool ShowConnectionDialog (IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)
 			=> new ConnectionDialog (cxInfo).ShowDialog() == true;
@@ -60,87 +64,29 @@ namespace NY.Dataverse.LINQPadDriver
 			List<ExplorerItem> explorerItems = new List<ExplorerItem>();
 			var client = new CdsServiceClient(connectionProperties.ConnectionString);
 			if (client.IsReady)
-			{
-				var entityMetadata = (from e in client.GetAllEntityMetadata(filter: EntityFilters.Attributes | EntityFilters.Entity | EntityFilters.Relationships)
-									  where e.IsPrivate == false
-									  orderby e.LogicalName
-									  select (entityMetadata: e, optionMetadata: (from attribute in e.Attributes
-																		   where attribute.AttributeType == AttributeTypeCode.State || attribute.AttributeType == AttributeTypeCode.Status || attribute.AttributeType == AttributeTypeCode.Picklist
-																		   orderby attribute.LogicalName
-																		   select (attributeName: attribute.SchemaName, options: ((EnumAttributeMetadata)attribute).OptionSet.Options.Select(x => {
-																			   var allOptions = ((EnumAttributeMetadata)attribute).OptionSet.Options;
-																			   var enumValue = string.Join("_", x.Label.UserLocalizedLabel.Label.Split(" "));
-																			   enumValue = new Regex("[^a-zA-Z0-9_]").Replace(enumValue, "");
-																			   if (string.IsNullOrEmpty(enumValue))
-																			   {
-																				   enumValue = $"_{x.Value}";
-																			   }
-																			   else if (IsCSharpKeyword(enumValue) || char.IsDigit(enumValue[0]) || allOptions.Count(o => o.Label.UserLocalizedLabel.Label == x.Label.UserLocalizedLabel.Label) > 1)
-																			   {
-																				   enumValue = $"_{enumValue}_{x.Value}";
-																			   }
-																			   return (Label: enumValue, x.Value);
-																		   }).ToList())).ToList()
-									  )).ToList();
-				var code = new CDSTemplate(entityMetadata) { Namespace = nameSpace, TypeName = typeName }.TransformText();
+            {
+                var entityMetadata = GetEntityMetadata(client);
+                var code = new CDSTemplate(entityMetadata) { Namespace = nameSpace, TypeName = typeName }.TransformText();
 #if DEBUG
 				File.WriteAllText(Path.Combine(GetContentFolder(), "LINQPad.EarlyBound.cs"), code);
 #endif
-				Compile(code, assemblyToBuild.CodeBase, cxInfo);
-				foreach (var entity in entityMetadata)
-				{
-					var attributes = entity.entityMetadata.Attributes
-					.Where(x => x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules)
-					.OrderBy(x => x.LogicalName)
-					.Select(a => new ExplorerItem($"{a.SchemaName} ({a.AttributeType})", ExplorerItemKind.Parameter, ExplorerIcon.Column)
-					{
-						Icon = a.IsPrimaryId == true ? ExplorerIcon.Key : ExplorerIcon.Column,
-						Tag = a.LogicalName
-					}).ToList();
-					ExplorerItem item = new ExplorerItem(entity.entityMetadata.SchemaName, ExplorerItemKind.QueryableObject, ExplorerIcon.Table)
-					{
-						IsEnumerable = true,
-						Children = attributes,
-						Tag = entity.entityMetadata.LogicalName
-					};
-					explorerItems.Add(item);
-				}
+                Compile(code, assemblyToBuild.CodeBase, cxInfo);
 
-				foreach (var entity in entityMetadata)
-				{
-					var source = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == entity.entityMetadata.LogicalName);
-					foreach (var oneToMany in entity.entityMetadata.OneToManyRelationships)
-					{
-						var target = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == oneToMany.ReferencingEntity);
-						if (target != null)
-						{
-							source?.Children.Add(new ExplorerItem(oneToMany.SchemaName, ExplorerItemKind.CollectionLink, ExplorerIcon.OneToMany)
-							{
-								HyperlinkTarget = target,
-								ToolTipText = oneToMany.ReferencingAttribute
-							});
-						}
-					}
+                BuildEntityAndAttributeExplorerItems(explorerItems, entityMetadata);
 
-					foreach (var manyToOne in entity.entityMetadata.ManyToOneRelationships)
-					{
-						var targetEntity = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == manyToOne.ReferencedEntity);
-						var targetAttribute = targetEntity?.Children.FirstOrDefault(e => e.Kind == ExplorerItemKind.Parameter && (string)e.Tag == manyToOne.ReferencedAttribute);
-						if (targetAttribute != null)
-						{
-							source?.Children.Add(new ExplorerItem(manyToOne.SchemaName, ExplorerItemKind.ReferenceLink, ExplorerIcon.ManyToOne)
-							{
-								HyperlinkTarget = targetAttribute,
-								ToolTipText = manyToOne.ReferencingAttribute
-							});
-						}
-					}
-				}
-			}
-			return explorerItems;
+                foreach (var entity in entityMetadata)
+                {
+                    var source = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == entity.entityMetadata.LogicalName);
+
+                    BuildOneToManyRelationLinks(explorerItems, entity, source);
+
+                    BuildManyToOneRelationLinks(explorerItems, entity, source);
+                }
+            }
+            return explorerItems;
 		}
 
-		public override void InitializeContext(IConnectionInfo cxInfo, object context,
+        public override void InitializeContext(IConnectionInfo cxInfo, object context,
 												QueryExecutionManager executionManager)
 		{
 			_driverInstance = this;
@@ -190,20 +136,150 @@ namespace NY.Dataverse.LINQPadDriver
 				throw new Exception("Cannot compile typed context: " + compileResult.Errors[0]);
 		}
 
-		//public override void PreprocessObjectToWrite(ref object objectToWrite, ObjectGraphInfo info)
-		//{
-		//	if(objectToWrite is IQueryable)
-		//	{
-		//		var linqQuery = (IQueryable)objectToWrite;
-		//		var query = (QueryExpression)(linqQuery).Provider.GetType().InvokeMember("GetQueryExpression", BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, linqQuery.Provider, new List<object> { linqQuery.Expression, false, false, null, null, null }.ToArray());
-		//		var expressionToFetchXmlRequest = new QueryExpressionToFetchXmlRequest
-		//		{
-		//			Query = query
-		//		};
+        //public override void PreprocessObjectToWrite(ref object objectToWrite, ObjectGraphInfo info)
+        //{
+        //	if(objectToWrite is IQueryable)
+        //	{
+        //		var linqQuery = (IQueryable)objectToWrite;
+        //		var query = (QueryExpression)(linqQuery).Provider.GetType().InvokeMember("GetQueryExpression", BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, linqQuery.Provider, new List<object> { linqQuery.Expression, false, false, null, null, null }.ToArray());
+        //		var expressionToFetchXmlRequest = new QueryExpressionToFetchXmlRequest
+        //		{
+        //			Query = query
+        //		};
 
-		//		var organizationResponse = (QueryExpressionToFetchXmlResponse)_cdsClient.Execute(expressionToFetchXmlRequest);
-		//		_fetchXml = XElement.Parse(organizationResponse.FetchXml);
-		//	}
-		//}
+        //		var organizationResponse = (QueryExpressionToFetchXmlResponse)_cdsClient.Execute(expressionToFetchXmlRequest);
+        //		_fetchXml = XElement.Parse(organizationResponse.FetchXml);
+        //	}
+        //}
+
+        #region Helper Methods
+
+        private static List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> GetEntityMetadata(CdsServiceClient client)
+        {
+            return (from e in client.GetAllEntityMetadata(filter: EntityFilters.Attributes | EntityFilters.Entity | EntityFilters.Relationships)
+                    where e.IsPrivate == false
+                    orderby e.LogicalName
+                    select (entityMetadata: e, optionMetadata: (from attribute in e.Attributes.Where(a => a.AttributeType == AttributeTypeCode.State || a.AttributeType == AttributeTypeCode.Status || a.AttributeType == AttributeTypeCode.Picklist).OrderBy(a => a.LogicalName)
+                                                                let allOptions = from a in ((EnumAttributeMetadata)attribute).OptionSet.Options
+                                                                                 select new { a.Label, a.Value, SanitisedLabel = a.Label.UserLocalizedLabel.Label.Sanitise() }
+                                                                select (attributeName: attribute.SchemaName, options: allOptions.Select(x =>
+                                                                {
+                                                                    var enumValue = x.SanitisedLabel;
+                                                                    if (string.IsNullOrEmpty(x.SanitisedLabel))
+                                                                    {
+                                                                        enumValue = $"_{x.Value}";
+                                                                    }
+                                                                    else if (IsCSharpKeyword(enumValue) || char.IsDigit(enumValue[0]) || allOptions.Count(o => o.SanitisedLabel == x.SanitisedLabel) > 1)
+                                                                    {
+                                                                        enumValue = $"_{enumValue}_{x.Value}";
+                                                                    }
+                                                                    return (Label: enumValue, x.Value);
+                                                                }).ToList())).ToList()
+                    )).ToList();
+        }
+
+        private static void BuildEntityAndAttributeExplorerItems(List<ExplorerItem> explorerItems, List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> entityMetadata)
+        {
+            foreach (var entity in entityMetadata)
+            {
+                var attributes = entity.entityMetadata.Attributes
+                .Where(x => x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules)
+                .OrderBy(x => x.LogicalName)
+                .Select(a => new ExplorerItem($"{a.SchemaName} ({GetTypeFromCode(a.AttributeType)})", ExplorerItemKind.Parameter, ExplorerIcon.Column)
+                {
+                    Icon = a.IsPrimaryId == true ? ExplorerIcon.Key : ExplorerIcon.Column,
+                    Tag = a.LogicalName
+                }).ToList();
+                ExplorerItem item = new ExplorerItem(entity.entityMetadata.SchemaName, ExplorerItemKind.QueryableObject, ExplorerIcon.Table)
+                {
+                    IsEnumerable = true,
+                    Children = attributes,
+                    Tag = entity.entityMetadata.LogicalName
+                };
+                explorerItems.Add(item);
+            }
+        }
+
+        private static void BuildOneToManyRelationLinks(List<ExplorerItem> explorerItems, (EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata) entity, ExplorerItem source)
+        {
+            foreach (var oneToMany in entity.entityMetadata.OneToManyRelationships)
+            {
+                var target = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == oneToMany.ReferencingEntity);
+                if (target != null)
+                {
+                    source?.Children.Add(new ExplorerItem(oneToMany.SchemaName, ExplorerItemKind.CollectionLink, ExplorerIcon.OneToMany)
+                    {
+                        HyperlinkTarget = target,
+                        ToolTipText = oneToMany.ReferencingAttribute
+                    });
+                }
+            }
+        }
+
+        private static void BuildManyToOneRelationLinks(List<ExplorerItem> explorerItems, (EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata) entity, ExplorerItem source)
+        {
+            foreach (var manyToOne in entity.entityMetadata.ManyToOneRelationships)
+            {
+                var targetEntity = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == manyToOne.ReferencedEntity);
+                var targetAttribute = targetEntity?.Children.FirstOrDefault(e => e.Kind == ExplorerItemKind.Parameter && (string)e.Tag == manyToOne.ReferencedAttribute);
+                if (targetAttribute != null)
+                {
+                    source?.Children.Add(new ExplorerItem(manyToOne.SchemaName, ExplorerItemKind.ReferenceLink, ExplorerIcon.ManyToOne)
+                    {
+                        HyperlinkTarget = targetAttribute,
+                        ToolTipText = manyToOne.ReferencingAttribute
+                    });
+                }
+            }
+        }
+
+		private static string GetTypeFromCode(AttributeTypeCode? attributeTypeCode)
+		{
+			var attributeType = "object";
+			switch (attributeTypeCode)
+			{
+				case AttributeTypeCode.BigInt:
+				case AttributeTypeCode.Integer:
+					attributeType = "Whole Number";
+					break;
+				case AttributeTypeCode.Boolean:
+				case AttributeTypeCode.ManagedProperty:
+					attributeType = "Choice";
+					break;
+				case AttributeTypeCode.Customer:
+				case AttributeTypeCode.Lookup:
+				case AttributeTypeCode.Owner:
+					attributeType = "Lookup";
+					break;
+				case AttributeTypeCode.DateTime:
+					attributeType = "DateTime";
+					break;
+				case AttributeTypeCode.Decimal:
+					attributeType = "Decimal";
+					break;
+				case AttributeTypeCode.Double:
+					attributeType = "Double";
+					break;
+				case AttributeTypeCode.EntityName:
+				case AttributeTypeCode.Memo:
+				case AttributeTypeCode.String:
+					attributeType = "String";
+					break;
+				case AttributeTypeCode.Money:
+					attributeType = "Money";
+					break;
+				case AttributeTypeCode.Picklist:
+				case AttributeTypeCode.State:
+				case AttributeTypeCode.Status:
+					attributeType = "Choices";
+					break;
+				case AttributeTypeCode.Uniqueidentifier:
+					attributeType = "Guid";
+					break;
+			}
+			return attributeType;
+		}
+
+		#endregion
 	}
 }

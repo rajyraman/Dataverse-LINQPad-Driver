@@ -30,7 +30,7 @@
         <TextBox Name="txtCertificateThumbprint" Padding="0,0,0,2" Margin="5,0,0,0" Text="{Binding CertificateThumbprint}"  Visibility="{Binding IsChecked, ElementName=certificate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
         <Label Padding="0,0,0,2" Margin="5">Connection Name</Label>
-        <TextBox Name="txtConnectionName" Padding="0,0,0,2" Margin="5,0,0,0" Text="{Binding ConnectionInfo.DisplayName}" />
+        <TextBox Name="txtConnectionName" Padding="0,0,0,2" Margin="5,0,0,0" Text="{Binding ConnectionName}" />
 
         <DockPanel LastChildFill="False" Margin="0,15,0,0">
             <CheckBox IsChecked="{Binding ConnectionInfo.Persist}" VerticalAlignment="Center">Remember this connection</CheckBox>

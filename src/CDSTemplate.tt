@@ -9,6 +9,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Xml.Linq;
 using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
@@ -16,10 +18,12 @@ using System.Runtime.Serialization;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Client;
+using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Sdk.Linq;
 using Microsoft.PowerPlatform.Cds.Client;
+using Microsoft.Crm.Sdk.Messages;
 
 [assembly: Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute()]
-
 namespace <#=this.Namespace#>.Entities
 {
 	<#foreach (var entity in Metadata)
@@ -73,11 +77,11 @@ namespace <#=this.Namespace#>.Entities
 				<#if(attribute.LogicalName == entity.entityMetadata.PrimaryIdAttribute) 
 				{#>
 					[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
-					public System.Nullable<System.Guid> <#=attributeName#>
+					public Guid? <#=attributeName#>
 					{
 						get
 						{
-							return this.GetAttributeValue<System.Nullable<System.Guid>>("<#=attribute.LogicalName#>");
+							return this.GetAttributeValue<Guid?>("<#=attribute.LogicalName#>");
 						}
 						set
 						{
@@ -118,6 +122,8 @@ namespace <#=this.Namespace#>.Entities
 						{
 							return (<#=enumName#>?)this.GetAttributeValue<OptionSetValue>("<#=attribute.LogicalName#>")?.Value;
 						}
+				<#if(attribute.IsValidForUpdate == true || attribute.IsValidForCreate == true) 
+				{#>
 						[System.Diagnostics.DebuggerNonUserCode()]
 						set
 						{
@@ -125,6 +131,7 @@ namespace <#=this.Namespace#>.Entities
 							this.SetAttributeValue("<#=attribute.LogicalName#>", value.HasValue ? new OptionSetValue((int)value) : null);
 							this.OnPropertyChanged("<#=attributeName#>");
 						}
+				<#}#>
 					}
 				<#} else { #>
 				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]		
@@ -132,14 +139,17 @@ namespace <#=this.Namespace#>.Entities
 				{
 					get
 					{
-						return this.GetAttributeValue<<#=attributeType#>>("<#=attribute.LogicalName#>");
+						return this.GetAttributeValue<<#=attributeType#>>("<#=attribute.LogicalName#>")<#=attribute.AttributeType == AttributeTypeCode.DateTime ? "?.ToLocalTime()" : ""#>;
 					}
+				<#if(attribute.IsValidForUpdate == true || attribute.IsValidForCreate == true) 
+				{#>
 					set
 					{
 						this.OnPropertyChanging("<#=attributeName#>");
 						this.SetAttributeValue("<#=attribute.LogicalName#>", value);
 						this.OnPropertyChanged("<#=attributeName#>");
 					}
+				<#}#>
 				}
 				<#}#>
 			<#}#>
@@ -149,7 +159,23 @@ namespace <#=this.Namespace#>.Entities
 
 namespace <#= this.Namespace #>
 {
-	using Entities; 
+	using Entities;
+
+	public static class QueryExtensions
+	{
+		public static XElement ToFetchXML(this IQueryable<object> linqQuery, CdsServiceClient _client)
+		{
+			var query = (QueryExpression)(linqQuery).Provider.GetType().InvokeMember("GetQueryExpression", BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, linqQuery.Provider, new List<object> { linqQuery.Expression, false, false, null, null, null }.ToArray());
+			var expressionToFetchXmlRequest = new QueryExpressionToFetchXmlRequest
+			{
+				Query = query
+			};
+
+			var organizationResponse = (QueryExpressionToFetchXmlResponse)_client.Execute(expressionToFetchXmlRequest);
+			return XElement.Parse(organizationResponse.FetchXml);
+		}	
+	}
+	
 	<#foreach (var entity in Metadata)
 	{#>
 		<#foreach (var optionMetadata in entity.optionMetadata)
@@ -223,7 +249,7 @@ string GetTypeFromCode(AttributeTypeCode? attributeTypeCode)
 			attributeType = "EntityReference";
 			break;
 		case AttributeTypeCode.DateTime:
-			attributeType = "DateTime";
+			attributeType = "DateTime?";
 			break;
 		case AttributeTypeCode.Decimal:
 			attributeType = "decimal";
