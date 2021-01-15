@@ -1,18 +1,16 @@
 <Query Kind="Statements">
   <Connection>
-    <ID>43a4e350-a857-4c1a-a516-57605953ef5d</ID>
+    <ID>45c2b9d0-74b3-44f5-a479-d9004e2fe864</ID>
     <NamingServiceVersion>2</NamingServiceVersion>
+    <Driver Assembly="NY.Dataverse.LINQPadDriver" PublicKeyToken="1f402b3ef4c25058">NY.Dataverse.LINQPadDriver.DynamicDriver</Driver>
     <Persist>true</Persist>
-    <Driver Assembly="NY.Dataverse.LINQPadDriver" PublicKeyToken="no-strong-name">NY.Dataverse.LINQPadDriver.DynamicDriver</Driver>
-    <DisplayName>Dataverse Connection</DisplayName>
     <DriverData>
-      <EnvironmentUrl>https://environment.crm.dynamics.com</EnvironmentUrl>
+      <EnvironmentUrl>https://crm.crm6.dynamics.com</EnvironmentUrl>
       <ApplicationId></ApplicationId>
       <ClientSecret></ClientSecret>
+      <ConnectionName>Dataverse</ConnectionName>
     </DriverData>
   </Connection>
-  <Namespace>Microsoft.PowerPlatform.Cds.Client</Namespace>
-  <Namespace>Microsoft.Xrm.Sdk.Metadata</Namespace>
   <Namespace>Microsoft.Crm.Sdk.Messages</Namespace>
 </Query>
 
@@ -22,7 +20,8 @@ e.DataProviderId == null &&
 e.LogicalName != LINQPad.User.Entities.UserQuery.EntityLogicalName &&
 e.LogicalName != LINQPad.User.Entities.UserQueryVisualization.EntityLogicalName
 select e.LogicalName).ToArray();
-((RetrieveTotalRecordCountResponse)this.DataverseClient.Execute(
-new RetrieveTotalRecordCountRequest {
+((Microsoft.Crm.Sdk.Messages.RetrieveTotalRecordCountResponse)this.DataverseClient.Execute(
+new Microsoft.Crm.Sdk.Messages.RetrieveTotalRecordCountRequest
+{
 EntityNames = entities
-})).EntityRecordCountCollection.OrderByDescending(x => x.Value).Dump("Record Count");
+})).EntityRecordCountCollection.Chart(x => x.Key, x => x.Value, LINQPad.Util.SeriesType.Pie).Dump("Record Count")

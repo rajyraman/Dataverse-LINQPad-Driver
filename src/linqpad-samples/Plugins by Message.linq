@@ -3,12 +3,13 @@
     <ID>43a4e350-a857-4c1a-a516-57605953ef5d</ID>
     <NamingServiceVersion>2</NamingServiceVersion>
     <Persist>true</Persist>
-    <Driver Assembly="NY.Dataverse.LINQPadDriver" PublicKeyToken="no-strong-name">NY.Dataverse.LINQPadDriver.DynamicDriver</Driver>
+    <Driver Assembly="NY.Dataverse.LINQPadDriver" PublicKeyToken="1f402b3ef4c25058">NY.Dataverse.LINQPadDriver.DynamicDriver</Driver>
     <DisplayName>Dataverse Connection</DisplayName>
     <DriverData>
-      <EnvironmentUrl>https://environment.crm.dynamics.com</EnvironmentUrl>
+      <EnvironmentUrl>https://crm.crm6.dynamics.com</EnvironmentUrl>
       <ApplicationId></ApplicationId>
       <ClientSecret></ClientSecret>
+      <ConnectionName>Dataverse</ConnectionName>
     </DriverData>
   </Connection>
   <Namespace>Microsoft.PowerPlatform.Cds.Client</Namespace>
