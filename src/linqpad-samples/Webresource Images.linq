@@ -14,13 +14,12 @@
 </Query>
 
 (from w in WebResource
-where w.WebResourceType == WebResource_WebResourceType.JPG_format ||
-w.WebResourceType == WebResource_WebResourceType.ICO_format ||
-w.WebResourceType == WebResource_WebResourceType.GIF_format ||
+where w.WebResourceType == WebResource_WebResourceType.JPG_format || 
+w.WebResourceType == WebResource_WebResourceType.ICO_format || 
+w.WebResourceType == WebResource_WebResourceType.GIF_format || 
 w.WebResourceType == WebResource_WebResourceType.PNG_format ||
 w.WebResourceType == WebResource_WebResourceType.Vector_format_SVG
-select new {
-w.Name,
-w.DisplayName,
-Image = w.WebResourceType == WebResource_WebResourceType.Vector_format_SVG ? Util.RawHtml(Encoding.ASCII.GetString(Convert.FromBase64String(w.Content))) : Util.Image(Convert.FromBase64String(w.Content))
+select new { 
+	Name = new Hyperlinq($"{DataverseClient.ConnectedOrgPublishedEndpoints[EndpointType.WebApplication]}/WebResources/{w.Name}",w.Name), 
+	Image = w.WebResourceType == WebResource_WebResourceType.Vector_format_SVG ? Util.RawHtml(Encoding.ASCII.GetString(Convert.FromBase64String(w.Content))) : Util.Image(Convert.FromBase64String(w.Content))
 }).Take(100)
