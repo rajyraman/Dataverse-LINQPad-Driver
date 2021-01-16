@@ -39,7 +39,7 @@ namespace NY.Dataverse.LINQPadDriver
         public override string GetConnectionDescription(IConnectionInfo connectionInfo) 
         {
             var connectionProperties = new ConnectionProperties(connectionInfo);
-            return $"{connectionProperties.ConnectionName} ({connectionProperties.EnvironmentUrl})";
+            return !string.IsNullOrEmpty(connectionProperties.ConnectionName) ? $"{connectionProperties.ConnectionName} ({connectionProperties.EnvironmentUrl})" : connectionProperties.EnvironmentUrl;
         }
 
 		public override bool ShowConnectionDialog (IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)

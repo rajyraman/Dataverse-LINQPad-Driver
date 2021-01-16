@@ -13,28 +13,25 @@ namespace NY.Dataverse.LINQPadDriver
 	class ConnectionProperties
 	{
 		public IConnectionInfo ConnectionInfo { get; private set; }
+		public string ContentPath { get; private set; }
+
 
 		XElement DriverData => ConnectionInfo.DriverData;
 
-		public ConnectionProperties (IConnectionInfo cxInfo)
-		{
-			ConnectionInfo = cxInfo;
-		}
+		public ConnectionProperties(IConnectionInfo cxInfo) => ConnectionInfo = cxInfo;
 
 		public string ConnectionString
 		{
 			get
 			{
-				switch (AuthenticationType)
-				{
-					case AuthenticationType.ClientSecret:
-						return $"AuthType=ClientSecret; Url={EnvironmentUrl}; ClientId={ApplicationId}; ClientSecret={ClientSecret}";
-					case AuthenticationType.Certificate:
-						return $"AuthType=Certificate; Url={EnvironmentUrl}; ClientId={ApplicationId}; Thumbprint={CertificateThumbprint}";
-					default:
-						return "";
-				}
-			}
+                return AuthenticationType switch
+                {
+                    "ClientSecret" => $"AuthType=ClientSecret; Url={EnvironmentUrl}; ClientId={ApplicationId}; ClientSecret={ClientSecret}",
+					"Certificate" => $"AuthType=Certificate; Url={EnvironmentUrl}; ClientId={ApplicationId}; Thumbprint={CertificateThumbprint}",
+					"OAuth" => $"AuthType=OAuth; Url={EnvironmentUrl}; ClientId={ApplicationId}; Thumbprint={CertificateThumbprint};RedirectUri=http://localhost;LoginPrompt=Auto;TokenCacheStorePath={Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}",
+                    _ => "",
+                };
+            }
 		}
 
 		public string ApplicationId
@@ -67,20 +64,41 @@ namespace NY.Dataverse.LINQPadDriver
 			set => DriverData.SetElementValue("EnvironmentUrl", value);
 		}
 
-		public AuthenticationType AuthenticationType
+		public string AuthenticationType
 		{
-			get => (AuthenticationType?)(int?)DriverData.Element("AuthenticationType") ?? AuthenticationType.ClientSecret;
-			set => DriverData.SetElementValue("AuthenticationType", (int)value);
-		}
-		public string ConnectionName
+			get => ((string)DriverData.Element("AuthenticationType")) ?? "OAuth";
+			set
+            {
+				DriverData.SetElementValue("AuthenticationType", value);
+                switch (value)
+                {
+                    case "ClientSecret":
+						DriverData.SetElementValue("CertificateThumbprint", ConnectionInfo.Encrypt(null));
+						break;
+                    case "Certificate":
+						DriverData.SetElementValue("ClientSecret", ConnectionInfo.Encrypt(null));
+						break;
+                    default:
+						DriverData.SetElementValue("CertificateThumbprint", ConnectionInfo.Encrypt(null));
+						DriverData.SetElementValue("ClientSecret", ConnectionInfo.Encrypt(null));
+						break;
+				}
+            }
+        }
+        public string ConnectionName
 		{
 			get => (string)DriverData.Element("ConnectionName") ?? "";
 			set => DriverData.SetElementValue("ConnectionName", value);
+		}
+		public string UserName
+		{
+			get => (string)DriverData.Element("UserName") ?? "";
+			set => DriverData.SetElementValue("UserName", value);
 		}
 
 		public CdsServiceClient GetCdsClient()
 		{
 			return new CdsServiceClient(this.ConnectionString);
 		}
-	}
+    }
 }
