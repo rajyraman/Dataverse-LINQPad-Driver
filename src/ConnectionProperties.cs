@@ -69,21 +69,21 @@ namespace NY.Dataverse.LINQPadDriver
 			get => ((string)DriverData.Element("AuthenticationType")) ?? "OAuth";
 			set
             {
-				DriverData.SetElementValue("AuthenticationType", value);
                 switch (value)
                 {
                     case "ClientSecret":
-						DriverData.SetElementValue("CertificateThumbprint", ConnectionInfo.Encrypt(null));
+						CertificateThumbprint = null;
 						break;
                     case "Certificate":
-						DriverData.SetElementValue("ClientSecret", ConnectionInfo.Encrypt(null));
+						ClientSecret = null;
 						break;
                     default:
-						DriverData.SetElementValue("CertificateThumbprint", ConnectionInfo.Encrypt(null));
-						DriverData.SetElementValue("ClientSecret", ConnectionInfo.Encrypt(null));
+						CertificateThumbprint = null;
+						ClientSecret = null;
 						break;
 				}
-            }
+				DriverData.SetElementValue("AuthenticationType", value);
+			}
         }
         public string ConnectionName
 		{
