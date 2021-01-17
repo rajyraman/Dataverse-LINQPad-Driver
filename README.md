@@ -6,6 +6,14 @@ This new driver is a dynamic driver that uses [Microsoft.PowerPlatform.Cds.Clien
 
 The _Microsoft.PowerPlatform.Cds.Client_ package is still in alpha, so there might be some naming changes/bugs which you can log in this repo for me to triage. I can then either fix it in the driver, or report it on the _Microsoft.PowerPlatform.Cds.Client_ repo, if it is not a driver code issue.
 
+# Installing
+
+You can install the driver from LINQPad from nuget. Click on View more drivers, and then choose "Show all drivers". Search for Dataverse and you should be able to see the driver and install it.
+
+![View more drivers](images/newconnection.png)
+
+![Install](images/install.png)
+
 # Connecting to your Dataverse Environment
 
 [Microsoft.PowerPlatform.Cds.Client](https://github.com/microsoft/PowerPlatform-CdsServiceClient) supports three kinds of authentication:
@@ -16,7 +24,7 @@ The _Microsoft.PowerPlatform.Cds.Client_ package is still in alpha, so there mig
 
 After installing the driver from nuget, you can start using this driver by clicking _Add Connection_ link on LINQPad. You will be presented with the dialog below.
 
-![Connection](images/newconnection.png)
+![Connection Details](images/connection%20details.png)
 
 You can then choose the appropriate connection method and enter the connection details. [Scott Durow](https://twitter.com/scottdurow) has as great video on YouTube on how to do this, which you can use to setup your Application Registration and create the Application User. The redirect URL in the Application registration has to be **http://localhost**
 
