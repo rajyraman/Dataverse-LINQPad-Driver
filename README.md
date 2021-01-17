@@ -18,7 +18,7 @@ After installing the driver from nuget, you can start using this driver by click
 
 ![Connection](images/newconnection.png)
 
-You can then choose the appropriate connection method and enter the connection details. [Scott Durow](https://twitter.com/scottdurow) has as great video on YouTube on how to do this, which you can use to setup your Application Registration and create the Application User.
+You can then choose the appropriate connection method and enter the connection details. [Scott Durow](https://twitter.com/scottdurow) has as great video on YouTube on how to do this, which you can use to setup your Application Registration and create the Application User. The redirect URL in the Application registration has to be **http://localhost**
 
 [![Register Application User YouTube video](https://img.youtube.com/vi/Td7Bk3IXJ9s/0.jpg)](https://www.youtube.com/watch?v=Td7Bk3IXJ9s)
 
