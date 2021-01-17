@@ -8,6 +8,8 @@ on:
 
 jobs:
   build:
+    env:
+      buildConfig: 'Release'
     defaults:
       run:
         working-directory: src
@@ -25,7 +27,7 @@ jobs:
       run: dotnet restore
             
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore --configuration ${{ env.buildConfig }}
       
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+    - name: Create the package
+      run: dotnet pack --configuration ${{ env.buildConfig }}
