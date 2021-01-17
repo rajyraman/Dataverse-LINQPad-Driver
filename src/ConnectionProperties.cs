@@ -28,7 +28,7 @@ namespace NY.Dataverse.LINQPadDriver
                 {
                     "ClientSecret" => $"AuthType=ClientSecret; Url={EnvironmentUrl}; ClientId={ApplicationId}; ClientSecret={ClientSecret}",
 					"Certificate" => $"AuthType=Certificate; Url={EnvironmentUrl}; ClientId={ApplicationId}; Thumbprint={CertificateThumbprint}",
-					"OAuth" => $"AuthType=OAuth; Url={EnvironmentUrl}; ClientId={ApplicationId}; Thumbprint={CertificateThumbprint};RedirectUri=http://localhost;LoginPrompt=Auto;TokenCacheStorePath={Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}",
+					"OAuth" => $"AuthType=OAuth; Url={EnvironmentUrl}; ClientId={ApplicationId}; RedirectUri=http://localhost; LoginPrompt=Auto; TokenCacheStorePath={Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}",
                     _ => "",
                 };
             }

@@ -5,9 +5,9 @@
     <AssemblyName>NY.Dataverse.LINQPadDriver</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags>dataverse,linqpaddriver,commondataservice,powerapps,dynamics365</PackageTags>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Version>1.1.0</Version>
+    <FileVersion>1.1.0.0</FileVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <Authors>Natraj Yegnaraman</Authors>
     <Company>Natraj Yegnaraman</Company>
     <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
@@ -20,7 +20,8 @@
     <PackageProjectUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Initial release, which uses Microsoft.PowerPlatform.Cds.Client 0.3.6-Alpha for connecting with Dataverse.</PackageReleaseNotes>
+    <PackageReleaseNotes>1. Add sample queries - Webresource images, Record Count
+2. Removed Thumbprint option from OAuth connection string</PackageReleaseNotes>
     <PackageIcon>LINQPadDriver.png</PackageIcon>
     <PackageIconUrl />
     <Copyright>Natraj Yegnaraman</Copyright>
