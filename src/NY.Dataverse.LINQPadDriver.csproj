@@ -12,7 +12,7 @@
     <Company>Natraj Yegnaraman</Company>
     <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
     <Product>LINQPad Driver for Dataverse</Product>
-    <Description>This driver helps you connect to Dataverse (CDS) API and query or execute actions against the API. This driver utilises the .net core CDS assemblies to generate the early bound classes. Only Client Secret and Certificate Thumbprint are supported authentication mechanisms, as of Jan 2021.</Description>
+    <Description>This driver helps you connect to Dataverse (CDS) API and query or execute actions against the API. This driver utilises the .net core CDS assemblies to generate the early bound classes. The authentication methods supported are OAuth, Client Secret and Certificate Thumbprint.</Description>
     <RootNamespace>NY.Dataverse.LINQPadDriver</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>NY.Dataverse.LINQPadDriver.snk</AssemblyOriginatorKeyFile>
@@ -23,7 +23,8 @@
     <PackageReleaseNotes>Initial release, which uses Microsoft.PowerPlatform.Cds.Client 0.2.24-Alpha for connecting with Dataverse.</PackageReleaseNotes>
     <PackageIcon>LINQPadDriver.png</PackageIcon>
     <PackageIconUrl />
-    <Copyright>Natraj Yegnaraman</Copyright>    
+    <Copyright>Natraj Yegnaraman</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>    
   </PropertyGroup>
   <ItemGroup>
     <None Update="CDSTemplate.tt">
