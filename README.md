@@ -49,5 +49,6 @@ You can use _DataverseClient_ property to access the CdsServiceClient object. On
 # Thank You
 
 - Kenichiro Nakamura for writing the original driver, that I still use
+- Gayan Perara for CRM Code Generator, which was the first one to use T4 templates for generating early bound classes
 - Jo Albahari for creating LINQPad
 - People who helped me with testing - TBC
