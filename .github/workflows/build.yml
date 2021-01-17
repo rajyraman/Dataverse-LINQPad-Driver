@@ -1,0 +1,73 @@
+name: .NET
+
+on:
+ # push:
+ #   branches: [ master ]
+ # pull_request:
+ #   branches: [ master ]
+  workflow_dispatch:
+     inputs:
+       release:
+         description: "Release?"
+         required: true
+         default: false  
+jobs:
+  build:
+    env:
+      buildConfig: 'Release'
+    defaults:
+      run:
+        working-directory: src
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+        source-url: https://nuget.pkg.github.com/rajyraman/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}      
+          
+    - name: Restore dependencies
+      run: dotnet restore
+            
+    - name: Build
+      run: dotnet build --no-restore --configuration ${{ env.buildConfig }}
+      
+    - name: Create the package
+      id: create-package
+      run: |
+        $version = "$(Get-Date -Format "yyyy.MM.dd").${{ github.run_number }}";
+        dotnet pack --configuration ${{ env.buildConfig }};
+        Compress-Archive bin/Release/netcoreapp*/* bin/Release/netcoreapp*/NY.Dataverse.LINQPadDriver.lpx6  -Verbose;
+        echo "::set-output name=driverFileName::NY.Dataverse.LINQPadDriver_$version.lpx6";
+        echo "::set-output name=driverFileVersion::$version";
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.create-package.outputs.driverFileVersion }}
+        release_name: ${{ steps.create-package.outputs.driverFileName }}
+        draft: true
+        prerelease: false
+
+    - name: Upload LINQPad Driver
+      id: release-managed-solution
+      if: steps.create_release.conclusion == 'success'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: bin/Release/netcoreapp*/NY.Dataverse.LINQPadDriver.lpx6
+        asset_name: ${{ steps.create-package.outputs.driverFileName }}
+        asset_content_type: application/zip        
+    
+    #- name: Publish the package to GPR
+    #  run: dotnet nuget push bin/Release/*.nupkg
