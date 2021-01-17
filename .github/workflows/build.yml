@@ -28,7 +28,9 @@ jobs:
       with:
         dotnet-version: '3.1.x'
         source-url: https://nuget.pkg.github.com/rajyraman/index.json
-        
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}      
+          
     - name: Restore dependencies
       run: dotnet restore
             
@@ -67,5 +69,5 @@ jobs:
         asset_name: ${{ steps.create-package.outputs.driverFileName }}
         asset_content_type: application/zip        
     
-    - name: Publish the package to GPR
-      run: dotnet nuget push bin/Release/*.nupkg
+    #- name: Publish the package to GPR
+    #  run: dotnet nuget push bin/Release/*.nupkg
