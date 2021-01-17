@@ -6,10 +6,11 @@ on:
  # pull_request:
  #   branches: [ master ]
   workflow_dispatch:
-      release:
-        description: "Release?"
-        required: true
-        default: false  
+     inputs:
+       release:
+         description: "Release?"
+         required: true
+         default: false  
 jobs:
   build:
     env:
@@ -39,13 +40,20 @@ jobs:
         $version = "$(Get-Date -Format "yyyy.MM.dd").${{ github.run_number }}";
         $repoName = $('${{ github.repository }}' -replace '${{ github.repository_owner }}/', '' -replace '[^a-zA-Z]', '');
         dotnet pack --configuration ${{ env.buildConfig }};
-        Compress-Archive bin/Release/netcoreapp*/* bin/Release/netcoreapp*/$repoName_$version.lpx6
+        Compress-Archive bin/Release/netcoreapp*/* bin/Release/netcoreapp*/NY.Dataverse.LINQPadDriver.lpx6
         echo "::set-output name=driverFileName::$repoName_$version.lpx6"
-       
-    - uses: release-drafter/release-drafter@v5
+        echo "::set-output name=driverFileVersion::$version"
+    
+    - name: Create Release
       id: create_release
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.create-package.outputs.solutionVersion }}
+        release_name: ${{ steps.create-package.outputs.driverFileName }}
+        draft: true
+        prerelease: false
 
     - name: Upload LINQPad Driver
       id: release-managed-solution
@@ -55,6 +63,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: bin/Release/netcoreapp*/${{ steps.create-package.outputs.driverFileName }}
+        asset_path: bin/Release/netcoreapp*/NY.Dataverse.LINQPadDriver.lpx6
         asset_name: ${{ steps.create-package.outputs.driverFileName }}
         asset_content_type: application/zip        
