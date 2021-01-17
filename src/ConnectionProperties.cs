@@ -66,7 +66,7 @@ namespace NY.Dataverse.LINQPadDriver
 
 		public string AuthenticationType
 		{
-			get => ((string)DriverData.Element("AuthenticationType")) ?? "OAuth";
+			get => ((string)DriverData.Element("AuthenticationType"));
 			set
             {
                 switch (value)

@@ -5,9 +5,12 @@
     <Driver Assembly="NY.Dataverse.LINQPadDriver" PublicKeyToken="1f402b3ef4c25058">NY.Dataverse.LINQPadDriver.DynamicDriver</Driver>
     <Persist>true</Persist>
     <DriverData>
-      <EnvironmentUrl>https://crm.crm6.dynamics.com</EnvironmentUrl>
-      <ApplicationId></ApplicationId>
+      <CertificateThumbprint></CertificateThumbprint>
       <ClientSecret></ClientSecret>
+      <AuthenticationType></AuthenticationType>
+      <EnvironmentUrl>https://instance.crm.dynamics.com</EnvironmentUrl>
+      <ApplicationId></ApplicationId>
+      <UserName></UserName>
       <ConnectionName>Dataverse</ConnectionName>
     </DriverData>
   </Connection>
