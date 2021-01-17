@@ -20,7 +20,7 @@
     <PackageProjectUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Initial release, which uses Microsoft.PowerPlatform.Cds.Client 0.2.24-Alpha for connecting with Dataverse.</PackageReleaseNotes>
+    <PackageReleaseNotes>Initial release, which uses Microsoft.PowerPlatform.Cds.Client 0.3.6-Alpha for connecting with Dataverse.</PackageReleaseNotes>
     <PackageIcon>LINQPadDriver.png</PackageIcon>
     <PackageIconUrl />
     <Copyright>Natraj Yegnaraman</Copyright>

@@ -36,6 +36,10 @@ LINQPad has a whole bunch of samples on how to craft your LINQ queries, in case 
 
 ![samples](images/samples.png)
 
+I have also given five samples that illustrate the power of LINQPad and how you can use the driver to query Dataverse.
+
+![Dataverse Sample](images/dataverse%20samples.png)
+
 # Calling Dataverse API
 
 You can use _DataverseClient_ property to access the CdsServiceClient object. Once you have access to this object you can then basically do any operations that are supported by the client.
