@@ -56,7 +56,7 @@ You can use _DataverseClient_ property to access the CdsServiceClient object. On
 
 # Getting FetchXML from LINQ
 
-You can use the _ToFetchXML_ method to get the FetchXML query from LINQ query.
+You can use the _ToFetchXML_ method to get the FetchXML query from LINQ query. Known issue: The ToFetchXML currently does not work, if there is a _where_ condition.
 
 ![LINQ to FetchXML](images/linq%20to%20fetch.png)
 
