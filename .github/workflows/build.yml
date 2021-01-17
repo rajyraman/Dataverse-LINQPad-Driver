@@ -39,9 +39,9 @@ jobs:
       run: |
         $version = "$(Get-Date -Format "yyyy.MM.dd").${{ github.run_number }}";
         dotnet pack --configuration ${{ env.buildConfig }};
-        Compress-Archive bin/Release/netcoreapp*/* bin/Release/netcoreapp*/NY.Dataverse.LINQPadDriver.lpx6
-        echo "::set-output name=driverFileName::NY.Dataverse.LINQPadDriver_$version.lpx6"
-        echo "::set-output name=driverFileVersion::$version"
+        Compress-Archive bin/Release/netcoreapp*/* bin/Release/netcoreapp*/NY.Dataverse.LINQPadDriver.lpx6;
+        echo "::set-output name=driverFileName::NY.Dataverse.LINQPadDriver_$version.lpx6";
+        echo "::set-output name=driverFileVersion::$version";
     
     - name: Create Release
       id: create_release
