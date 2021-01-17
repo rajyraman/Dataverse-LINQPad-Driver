@@ -46,6 +46,12 @@ You can use _DataverseClient_ property to access the CdsServiceClient object. On
 
 ![Dataverse Client](images/dataverseclient.png)
 
+# Getting FetchXML from LINQ
+
+You can use the _ToFetchXML_ method to get the FetchXML query from LINQ query.
+
+![LINQ to FetchXML](images/linq%20to%20fetch.png)
+
 # Thank You
 
 - Kenichiro Nakamura for writing the original driver, that I still use
