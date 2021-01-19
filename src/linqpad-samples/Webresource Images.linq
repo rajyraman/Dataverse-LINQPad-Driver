@@ -7,15 +7,13 @@
     <DriverData>
       <CertificateThumbprint></CertificateThumbprint>
       <ClientSecret></ClientSecret>
-      <AuthenticationType></AuthenticationType>
+      <AuthenticationType>OAuth</AuthenticationType>
       <EnvironmentUrl>https://instance.crm.dynamics.com</EnvironmentUrl>
-      <ApplicationId></ApplicationId>
+      <ApplicationId>51f81489-12ee-4a9e-aaae-a2591f45987d</ApplicationId>
       <UserName></UserName>
       <ConnectionName>Dataverse</ConnectionName>
     </DriverData>
   </Connection>
-  <Namespace>Microsoft.Xrm.Sdk.Discovery</Namespace>
-  <Namespace>LINQPad.Controls</Namespace>
 </Query>
 
 (from w in WebResource

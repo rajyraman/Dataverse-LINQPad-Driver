@@ -11,8 +11,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace NY.Dataverse.LINQPadDriver
@@ -21,6 +19,7 @@ namespace NY.Dataverse.LINQPadDriver
 	{
 		static DynamicDriver _driverInstance;
 		static CdsServiceClient _cdsClient;
+		static QueryExecutionManager _queryExecutionManager;
 
 #if DEBUG
 		static DynamicDriver()
@@ -57,6 +56,8 @@ namespace NY.Dataverse.LINQPadDriver
 		public override List<ExplorerItem> GetSchemaAndBuildAssembly (
 			IConnectionInfo cxInfo, AssemblyName assemblyToBuild, ref string nameSpace, ref string typeName)
 		{
+			nameSpace = "NY.Dataverse.LINQPadDriver";
+			typeName = "LINQPadOrganizationServiceContext";
 #if DEBUG
 			Debugger.Launch();
 #endif
@@ -90,10 +91,14 @@ namespace NY.Dataverse.LINQPadDriver
 												QueryExecutionManager executionManager)
 		{
 			_driverInstance = this;
+            var preExecuteEvent = context.GetType().GetEvent("PreExecute");
+			var preExecuteEventHandler = GetType().GetMethod("OnPreExecute", BindingFlags.Static | BindingFlags.NonPublic);
+			preExecuteEvent.AddEventHandler(context, Delegate.CreateDelegate(preExecuteEvent.EventHandlerType, null, preExecuteEventHandler));
+			_queryExecutionManager = executionManager;
 			base.InitializeContext(cxInfo, context, executionManager);
 		}
 
-		public override bool AreRepositoriesEquivalent(IConnectionInfo r1, IConnectionInfo r2)
+        public override bool AreRepositoriesEquivalent(IConnectionInfo r1, IConnectionInfo r2)
 		{
 			return Equals(r1.DriverData.Element("EnvironmentUrl"), r2.DriverData.Element("EnvironmentUrl"));
 		}
@@ -114,6 +119,22 @@ namespace NY.Dataverse.LINQPadDriver
 		public override ParameterDescriptor[] GetContextConstructorParameters(IConnectionInfo connectionInfo) => new[]
 		{
 			new ParameterDescriptor("cdsServiceClient", typeof(CdsServiceClient).FullName)
+		};
+		public override IEnumerable<string> GetNamespacesToAdd(IConnectionInfo cxInfo) => new List<string>
+		{
+			"Microsoft.Crm.Sdk.Messages",
+			"Microsoft.Xrm.Sdk",
+			"Microsoft.Xrm.Sdk.Query",
+			"Microsoft.Xrm.Sdk.Client",
+			"Microsoft.Xrm.Sdk.Messages",
+			"Microsoft.Crm.Sdk.Messages",
+			"Microsoft.Xrm.Sdk.Metadata",
+			"Microsoft.Xrm.Sdk.Discovery",
+			"Microsoft.Xrm.Sdk.Extensions",
+			"Microsoft.Xrm.Sdk.Linq",
+			"Microsoft.Xrm.Sdk.WebServiceClient",
+			"Microsoft.PowerPlatform.Cds.Client",
+			"NY.Dataverse.LINQPadDriver.Entities"
 		};
 
 		static void Compile(string cSharpSourceCode, string outputFile, IConnectionInfo cxInfo)
@@ -136,25 +157,23 @@ namespace NY.Dataverse.LINQPadDriver
 				throw new Exception("Cannot compile typed context: " + compileResult.Errors[0]);
 		}
 
-        //public override void PreprocessObjectToWrite(ref object objectToWrite, ObjectGraphInfo info)
-        //{
-        //	if(objectToWrite is IQueryable)
-        //	{
-        //		var linqQuery = (IQueryable)objectToWrite;
-        //		var query = (QueryExpression)(linqQuery).Provider.GetType().InvokeMember("GetQueryExpression", BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, linqQuery.Provider, new List<object> { linqQuery.Expression, false, false, null, null, null }.ToArray());
-        //		var expressionToFetchXmlRequest = new QueryExpressionToFetchXmlRequest
-        //		{
-        //			Query = query
-        //		};
-
-        //		var organizationResponse = (QueryExpressionToFetchXmlResponse)_cdsClient.Execute(expressionToFetchXmlRequest);
-        //		_fetchXml = XElement.Parse(organizationResponse.FetchXml);
-        //	}
-        //}
-
         #region Helper Methods
+		private static void OnPreExecute(object sender, EventArgs e)
+        {
+			if (_cdsClient != null)
+			{
+				QueryExpression query = (QueryExpression)e.GetType().GetProperty("query").GetValue(e);
+                var expressionToFetchXmlRequest = new QueryExpressionToFetchXmlRequest
+                {
+                    Query = query
+                };
 
-        private static List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> GetEntityMetadata(CdsServiceClient client)
+                var organizationResponse = (QueryExpressionToFetchXmlResponse)_cdsClient.Execute(expressionToFetchXmlRequest);
+                _queryExecutionManager?.SqlTranslationWriter.WriteLine(XElement.Parse(organizationResponse.FetchXml).ToString());
+            }
+		}
+
+		private static List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> GetEntityMetadata(CdsServiceClient client)
         {
             return (from e in client.GetAllEntityMetadata(filter: EntityFilters.Attributes | EntityFilters.Entity | EntityFilters.Relationships)
                     where e.IsPrivate == false

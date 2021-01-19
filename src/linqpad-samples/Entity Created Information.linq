@@ -8,18 +8,15 @@
     <DriverData>
       <CertificateThumbprint></CertificateThumbprint>
       <ClientSecret></ClientSecret>
-      <AuthenticationType></AuthenticationType>
+      <AuthenticationType>OAuth</AuthenticationType>
       <EnvironmentUrl>https://instance.crm.dynamics.com</EnvironmentUrl>
-      <ApplicationId></ApplicationId>
+      <ApplicationId>51f81489-12ee-4a9e-aaae-a2591f45987d</ApplicationId>
       <UserName></UserName>
       <ConnectionName>Dataverse</ConnectionName>
     </DriverData>
-  </Connection>
-  <Namespace>Microsoft.PowerPlatform.Cds.Client</Namespace>
-  <Namespace>Microsoft.Xrm.Sdk.Metadata</Namespace>
 </Query>
 
 (from s in SavedQuery
-where s.QueryType == 0 && s.ReturnedTypeCode == LINQPad.User.Entities.Account.EntityLogicalName
-orderby s.CreatedOn
-select new { EntityName = s.ReturnedTypeCode, CreatedBy = s.CreatedBy.Name, CreatedOn = s.CreatedOn  }).Take(1)
+ where s.QueryType == 0 && s.ReturnedTypeCode == AccountTable.EntityLogicalName
+ orderby s.CreatedOn
+ select new { EntityName = s.ReturnedTypeCode, CreatedBy = s.CreatedBy.Name, CreatedOn = s.CreatedOn }).Take(1)

@@ -7,9 +7,9 @@
     <DriverData>
       <CertificateThumbprint></CertificateThumbprint>
       <ClientSecret></ClientSecret>
-      <AuthenticationType></AuthenticationType>
+      <AuthenticationType>OAuth</AuthenticationType>
       <EnvironmentUrl>https://instance.crm.dynamics.com</EnvironmentUrl>
-      <ApplicationId></ApplicationId>
+      <ApplicationId>51f81489-12ee-4a9e-aaae-a2591f45987d</ApplicationId>
       <UserName></UserName>
       <ConnectionName>Dataverse</ConnectionName>
     </DriverData>
@@ -20,11 +20,11 @@
 var entities = (from e in DataverseClient.GetAllEntityMetadata()
 where e.IsCustomizable.Value == true &&
 e.DataProviderId == null &&
-e.LogicalName != LINQPad.User.Entities.UserQuery.EntityLogicalName &&
-e.LogicalName != LINQPad.User.Entities.UserQueryVisualization.EntityLogicalName
+e.LogicalName != UserQueryTable.EntityLogicalName &&
+e.LogicalName != UserQueryVisualizationTable.EntityLogicalName
 select e.LogicalName).ToArray();
-((Microsoft.Crm.Sdk.Messages.RetrieveTotalRecordCountResponse)this.DataverseClient.Execute(
-new Microsoft.Crm.Sdk.Messages.RetrieveTotalRecordCountRequest
+((RetrieveTotalRecordCountResponse)this.DataverseClient.Execute(
+new RetrieveTotalRecordCountRequest
 {
 EntityNames = entities
-})).EntityRecordCountCollection.Chart(x => x.Key, x => x.Value, LINQPad.Util.SeriesType.Pie).Dump("Record Count")
+})).EntityRecordCountCollection.Chart(x => x.Key, x => x.Value, LINQPad.Util.SeriesType.Pie).Dump("Record Count");

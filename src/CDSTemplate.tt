@@ -22,18 +22,20 @@ using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Xrm.Sdk.Linq;
 using Microsoft.PowerPlatform.Cds.Client;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Messages;
 
 [assembly: Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute()]
+
 namespace <#=this.Namespace#>.Entities
 {
 	<#foreach (var entity in Metadata)
 	{#>
 		[System.Runtime.Serialization.DataContractAttribute()]
 		[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("<#=entity.entityMetadata.LogicalName#>")]
-		public partial class <#=entity.entityMetadata.SchemaName#> : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
+		public partial class <#=entity.entityMetadata.SchemaName#>Table : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 		{
 	
-			public <#=entity.entityMetadata.SchemaName#>() : 
+			public <#=entity.entityMetadata.SchemaName#>Table() : 
 					base(EntityLogicalName)
 			{
 			}
@@ -161,21 +163,6 @@ namespace <#= this.Namespace #>
 {
 	using Entities;
 
-	public static class QueryExtensions
-	{
-		public static XElement ToFetchXML(this IQueryable<object> linqQuery, CdsServiceClient _client)
-		{
-			var query = (QueryExpression)(linqQuery).Provider.GetType().InvokeMember("GetQueryExpression", BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, linqQuery.Provider, new List<object> { linqQuery.Expression, false, false, null, null, null }.ToArray());
-			var expressionToFetchXmlRequest = new QueryExpressionToFetchXmlRequest
-			{
-				Query = query
-			};
-
-			var organizationResponse = (QueryExpressionToFetchXmlResponse)_client.Execute(expressionToFetchXmlRequest);
-			return XElement.Parse(organizationResponse.FetchXml);
-		}	
-	}
-	
 	<#foreach (var entity in Metadata)
 	{#>
 		<#foreach (var optionMetadata in entity.optionMetadata)
@@ -193,33 +180,51 @@ namespace <#= this.Namespace #>
 		<#}#>
 	<#}#>
 
-	public partial class <#= this.TypeName #> : OrganizationServiceContext
-	{
-		
-		[System.Diagnostics.DebuggerNonUserCode()]
-		public <#= this.TypeName #>(IOrganizationService client) : 
-				base(client)
-		{
-			this.DataverseClient = (CdsServiceClient)client;
-		}
-		<# foreach (var entity in Metadata)
-		{
-		#>
-		public IQueryable<<#=entity.entityMetadata.SchemaName#>> <#=entity.entityMetadata.SchemaName#>
-		{
-			[System.Diagnostics.DebuggerNonUserCode()]
-			get
-			{
-				return this.CreateQuery<<#=entity.entityMetadata.SchemaName#>>();
-			}
-		}
-		<#}#>
+	public class LINQPadOrganizationServiceContext : OrganizationServiceContext
+	{	
+        public event EventHandler PreExecute;
 
-		public CdsServiceClient DataverseClient
+        public LINQPadOrganizationServiceContext(IOrganizationService service) : base(service)
+        {
+            this.DataverseClient = (CdsServiceClient)service;
+        }
+
+        protected override void OnExecute(OrganizationRequest request, OrganizationResponse response)
+        {
+			if(PreExecute != null && request is RetrieveMultipleRequest r)
+			{
+                PreExecute(this, new OnExecuteEventArgs((QueryExpression)r.Query));
+            }
+            base.OnExecute(request, response);
+        }
+
+        public CdsServiceClient DataverseClient
         {
             get;
             private set;
         }
+
+		<# foreach (var entity in Metadata)
+		{
+		#>
+		public IQueryable<<#=this.Namespace#>.Entities.<#=entity.entityMetadata.SchemaName#>Table> <#=entity.entityMetadata.SchemaName#>
+		{
+			[System.Diagnostics.DebuggerNonUserCode()]
+			get
+			{
+				return this.CreateQuery<<#=this.Namespace#>.Entities.<#=entity.entityMetadata.SchemaName#>Table>();
+			}
+		}
+		<#}#>
+	}
+
+	public class OnExecuteEventArgs : EventArgs
+	{
+		public QueryExpression query { get; set; }
+		public OnExecuteEventArgs(QueryExpression query)
+		{
+			this.query = query;
+		}
 	}
 }
 

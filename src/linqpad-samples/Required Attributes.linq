@@ -7,17 +7,16 @@
     <DriverData>
       <CertificateThumbprint></CertificateThumbprint>
       <ClientSecret></ClientSecret>
-      <AuthenticationType></AuthenticationType>
+      <AuthenticationType>OAuth</AuthenticationType>
       <EnvironmentUrl>https://instance.crm.dynamics.com</EnvironmentUrl>
-      <ApplicationId></ApplicationId>
+      <ApplicationId>51f81489-12ee-4a9e-aaae-a2591f45987d</ApplicationId>
       <UserName></UserName>
       <ConnectionName>Dataverse</ConnectionName>
     </DriverData>
   </Connection>
-  <Namespace>Microsoft.Xrm.Sdk.Metadata</Namespace>
 </Query>
 
-from a in this.DataverseClient.GetAllAttributesForEntity(LINQPad.User.Entities.Account.EntityLogicalName)
-where a.RequiredLevel.Value != Microsoft.Xrm.Sdk.Metadata.AttributeRequiredLevel.SystemRequired
+from a in this.DataverseClient.GetAllAttributesForEntity(AccountTable.EntityLogicalName)
+where a.RequiredLevel.Value != AttributeRequiredLevel.SystemRequired
 orderby a.LogicalName
 select new { a.LogicalName, a.SchemaName, a.AttributeType }

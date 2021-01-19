@@ -36,7 +36,7 @@ namespace NY.Dataverse.LINQPadDriver
 
 		public string ApplicationId
 		{
-			get => (string)DriverData.Element("ApplicationId") ?? "";
+			get => (string)DriverData.Element("ApplicationId") ?? "51f81489-12ee-4a9e-aaae-a2591f45987d"; //Default to MSFT's AppId provided for testing and prototyping as per https://docs.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect
 			set => DriverData.SetElementValue("ApplicationId", value);
 		}
 
@@ -66,7 +66,7 @@ namespace NY.Dataverse.LINQPadDriver
 
 		public string AuthenticationType
 		{
-			get => ((string)DriverData.Element("AuthenticationType"));
+			get => (string)DriverData.Element("AuthenticationType") ?? "OAuth";
 			set
             {
                 switch (value)
