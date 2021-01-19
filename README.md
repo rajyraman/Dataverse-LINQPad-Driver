@@ -4,11 +4,11 @@
 
 This new driver is a dynamic driver that uses [Microsoft.PowerPlatform.Cds.Client](https://github.com/microsoft/PowerPlatform-CdsServiceClient) assemblies which target .NET Core. The Tables (Entities) and associated metadata are regenerated everytime LINQPad is opened, so that you don't need to worry about keeping Dataverse Metadata and LINQPad context in sync.
 
-The _Microsoft.PowerPlatform.Cds.Client_ package is still in alpha, so there might be some naming changes/bugs which you can log in this repo for me to triage. I can then either fix it in the driver, or report it on the _Microsoft.PowerPlatform.Cds.Client_ repo, if it is not a driver code issue.
+The _Microsoft.PowerPlatform.Cds.Client_ package is still in alpha, so there might be some naming changes/bugs which you can log in this repo for me to triage. I can then either fix it in the driver, or report it on the _Microsoft.PowerPlatform.Cds.Client_ repo, if it is not a driver code issue. This driver will continue to be versioned as pre-release until such time _Microsoft.PowerPlatform.Cds.Client_ nuget package is marked as alpha.
 
 # Installing
 
-You can install the driver from LINQPad from nuget. Click on View more drivers, and then choose "Show all drivers". Search for Dataverse and you should be able to see the driver and install it.
+You can install the driver from LINQPad from nuget. Click on View more drivers, and then choose "Show all drivers" and also select the _Include Prerelease_ checkbox. Search for Dataverse and you should be able to see the driver and install it.
 
 ![View more drivers](images/newconnection.png)
 
@@ -29,6 +29,8 @@ After installing the driver from nuget, you can start using this driver by click
 You can then choose the appropriate connection method and enter the connection details. [Scott Durow](https://twitter.com/scottdurow) has as great video on YouTube on how to do this, which you can use to setup your Application Registration and create the Application User. The redirect URL in the Application registration has to be **http://localhost**
 
 [![Register Application User YouTube video](https://img.youtube.com/vi/Td7Bk3IXJ9s/0.jpg)](https://www.youtube.com/watch?v=Td7Bk3IXJ9s)
+
+If you don't want to set up a Azure AD App Registration, you can use the AppId provided by Microsoft for [development and testing purposes](https://docs.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/xrm-tooling/use-connection-strings-xrm-tooling-connect), which is _51f81489-12ee-4a9e-aaae-a2591f45987d_. Choose _OAuth_ as the authentication method along with this AppId, and you would be presented with the standard OAuth login prompt and LINQPad can use the generated token from the browser.
 
 # Running LINQ Query
 
@@ -56,7 +58,7 @@ You can use _DataverseClient_ property to access the CdsServiceClient object. On
 
 # Getting FetchXML from LINQ
 
-You can use the _ToFetchXML_ method to get the FetchXML query from LINQ query. Known issue: The ToFetchXML currently does not work, if there is a _where_ condition.
+Click on the SQL tab to see the corresponding FetchXML to the LINQ query.
 
 ![LINQ to FetchXML](images/linq%20to%20fetch.png)
 
