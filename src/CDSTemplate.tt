@@ -119,7 +119,9 @@ namespace <#=this.Namespace#>.Entities
 						}
 					}
 				<#} else if(attributeType == "PartyList") 
-				{#>
+				{
+					attributeName = char.ToUpper(attributeName[0]) + attributeName[1..];
+				#>
 				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
 				public IEnumerable<ActivityPartyTable> <#=attributeName#>
 				{

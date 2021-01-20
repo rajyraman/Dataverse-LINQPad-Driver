@@ -215,6 +215,10 @@ namespace NY.Dataverse.LINQPadDriver
                     {
 						attributeName = $"{a.SchemaName}1";
 					}
+					if(a.AttributeType == AttributeTypeCode.PartyList)
+                    {
+						attributeName = char.ToUpper(attributeName[0]) + attributeName[1..];
+					}
 					return new ExplorerItem($"{attributeName} ({GetTypeFromCode(a.AttributeType)})", ExplorerItemKind.Parameter, ExplorerIcon.Column)
 					{
 						Icon = a.IsPrimaryId == true ? ExplorerIcon.Key : ExplorerIcon.Column,
