@@ -71,10 +71,16 @@ namespace <#=this.Namespace#>.Entities
 					this.PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 				}
 			}
-			<#foreach (var attribute in entity.entityMetadata.Attributes.Where(x=>(!x.IsLogical.GetValueOrDefault() || x.IsRetrievable.GetValueOrDefault()) && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules))
+			<#foreach (var attribute in entity.entityMetadata.Attributes.Where(x=>(x.IsLogical == false
+			|| (x.IsLogical == true && x.IsValidForForm == true)) && x.AttributeType != AttributeTypeCode.Virtual 
+			&& x.AttributeType != AttributeTypeCode.CalendarRules))
 			{
 				var attributeType = GetTypeFromCode(attribute.AttributeType);
-				var attributeName = attribute.SchemaName == entity.entityMetadata.SchemaName ? $"{attribute.SchemaName}1" : attribute.SchemaName;
+				var attributeName = (attribute.SchemaName == entity.entityMetadata.SchemaName || 
+				attribute.SchemaName == "EntityLogicalName" ||
+				attribute.SchemaName == "EntityTypeCode" ||
+				attribute.SchemaName == "Id") 
+				? $"{attribute.SchemaName}1" : attribute.SchemaName;
 			#>
 				<#if(attribute.LogicalName == entity.entityMetadata.PrimaryIdAttribute) 
 				{#>
@@ -112,6 +118,38 @@ namespace <#=this.Namespace#>.Entities
 							this.<#=attributeName#> = value;
 						}
 					}
+				<#} else if(attributeType == "PartyList") 
+				{#>
+				[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
+				public IEnumerable<ActivityPartyTable> <#=attributeName#>
+				{
+					get
+					{
+						var collection = this.GetAttributeValue<EntityCollection>("<#=attribute.LogicalName#>");
+						if (collection != null && collection.Entities != null)
+						{
+							return Enumerable.Cast<ActivityPartyTable>(collection.Entities);
+						}
+						else
+						{
+							return null;
+						}
+					}
+					set
+					{
+						this.OnPropertyChanging("<#=attribute.LogicalName#>");
+						if ((value == null))
+						{
+							this.SetAttributeValue("<#=attribute.LogicalName#>", value);
+						}
+						else
+						{
+							this.SetAttributeValue("<#=attribute.LogicalName#>", 
+							new EntityCollection(new List<Microsoft.Xrm.Sdk.Entity>(value)));
+						}
+						this.OnPropertyChanged("<#=attribute.LogicalName#>");
+					}
+				}
 				<#} else if(attributeType == "OptionSetValue") 
 				{
 				   var enumName = $"{entity.entityMetadata.SchemaName}_{attribute.SchemaName}";
@@ -277,6 +315,9 @@ string GetTypeFromCode(AttributeTypeCode? attributeTypeCode)
 			break;
 		case AttributeTypeCode.Uniqueidentifier:
 			attributeType = "Guid";
+			break;
+		case AttributeTypeCode.PartyList:
+			attributeType = "PartyList";
 			break;
 	}
 	return attributeType;

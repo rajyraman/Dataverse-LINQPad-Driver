@@ -176,7 +176,6 @@ namespace NY.Dataverse.LINQPadDriver
 		private static List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> GetEntityMetadata(CdsServiceClient client)
         {
             return (from e in client.GetAllEntityMetadata(filter: EntityFilters.Attributes | EntityFilters.Entity | EntityFilters.Relationships)
-                    where e.IsPrivate == false
                     orderby e.LogicalName
                     select (entityMetadata: e, optionMetadata: (from attribute in e.Attributes.Where(a => a.AttributeType == AttributeTypeCode.State || a.AttributeType == AttributeTypeCode.Status || a.AttributeType == AttributeTypeCode.Picklist).OrderBy(a => a.LogicalName)
                                                                 let allOptions = from a in ((EnumAttributeMetadata)attribute).OptionSet.Options
@@ -202,13 +201,26 @@ namespace NY.Dataverse.LINQPadDriver
             foreach (var entity in entityMetadata)
             {
                 var attributes = entity.entityMetadata.Attributes
-                .Where(x => x.IsLogical == false && x.AttributeType != AttributeTypeCode.Virtual && x.AttributeType != AttributeTypeCode.CalendarRules)
+                .Where(x => (x.IsLogical == false || (x.IsLogical == true && x.IsValidForForm == true)) 
+				&& x.AttributeType != AttributeTypeCode.Virtual 
+				&& x.AttributeType != AttributeTypeCode.CalendarRules)
                 .OrderBy(x => x.LogicalName)
-                .Select(a => new ExplorerItem($"{a.SchemaName} ({GetTypeFromCode(a.AttributeType)})", ExplorerItemKind.Parameter, ExplorerIcon.Column)
-                {
-                    Icon = a.IsPrimaryId == true ? ExplorerIcon.Key : ExplorerIcon.Column,
-                    Tag = a.LogicalName
-                }).ToList();
+                .Select(a => 
+				{
+					var attributeName = a.SchemaName;
+					if(a.LogicalName == a.EntityLogicalName || 
+						a.SchemaName == "EntityLogicalName" ||
+						a.SchemaName == "EntityTypeCode" ||
+						a.SchemaName == "Id")
+                    {
+						attributeName = $"{a.SchemaName}1";
+					}
+					return new ExplorerItem($"{attributeName} ({GetTypeFromCode(a.AttributeType)})", ExplorerItemKind.Parameter, ExplorerIcon.Column)
+					{
+						Icon = a.IsPrimaryId == true ? ExplorerIcon.Key : ExplorerIcon.Column,
+						Tag = a.LogicalName
+					};
+				}).ToList();
                 ExplorerItem item = new ExplorerItem(entity.entityMetadata.SchemaName, ExplorerItemKind.QueryableObject, ExplorerIcon.Table)
                 {
                     IsEnumerable = true,
@@ -257,18 +269,24 @@ namespace NY.Dataverse.LINQPadDriver
 			var attributeType = "object";
 			switch (attributeTypeCode)
 			{
-				case AttributeTypeCode.BigInt:
 				case AttributeTypeCode.Integer:
 					attributeType = "Whole Number";
 					break;
+				case AttributeTypeCode.BigInt:
+					attributeType = "Big Integer";
+					break;
 				case AttributeTypeCode.Boolean:
 				case AttributeTypeCode.ManagedProperty:
-					attributeType = "Choice";
+					attributeType = "Yes/No";
+					break;
+				case AttributeTypeCode.Lookup:
+					attributeType = "Lookup";
 					break;
 				case AttributeTypeCode.Customer:
-				case AttributeTypeCode.Lookup:
+					attributeType = "Customer";
+					break;
 				case AttributeTypeCode.Owner:
-					attributeType = "Lookup";
+					attributeType = "Owner";
 					break;
 				case AttributeTypeCode.DateTime:
 					attributeType = "DateTime";
@@ -279,13 +297,17 @@ namespace NY.Dataverse.LINQPadDriver
 				case AttributeTypeCode.Double:
 					attributeType = "Double";
 					break;
-				case AttributeTypeCode.EntityName:
-				case AttributeTypeCode.Memo:
 				case AttributeTypeCode.String:
-					attributeType = "String";
+					attributeType = "Text";
+					break;
+				case AttributeTypeCode.EntityName:
+					attributeType = "Entity Name";
+					break;
+				case AttributeTypeCode.Memo:
+					attributeType = "Multiline Text";
 					break;
 				case AttributeTypeCode.Money:
-					attributeType = "Money";
+					attributeType = "Currency";
 					break;
 				case AttributeTypeCode.Picklist:
 				case AttributeTypeCode.State:
@@ -293,7 +315,10 @@ namespace NY.Dataverse.LINQPadDriver
 					attributeType = "Choices";
 					break;
 				case AttributeTypeCode.Uniqueidentifier:
-					attributeType = "Guid";
+					attributeType = "Unique Identifier";
+					break;
+				case AttributeTypeCode.PartyList:
+					attributeType = "Party List";
 					break;
 			}
 			return attributeType;
