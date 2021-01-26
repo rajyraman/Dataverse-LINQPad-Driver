@@ -50,24 +50,23 @@ using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Messages;
 
 [assembly: Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute()]
-
 namespace ");
             
-            #line 29 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 28 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Namespace));
             
             #line default
             #line hidden
             this.Write(".Entities\r\n{\r\n\t");
             
-            #line 31 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 30 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 foreach (var entity in Metadata)
 	{
             
             #line default
             #line hidden
-            this.Write("\t\t[System.Runtime.Serialization.DataContractAttribute()]\r\n\t\t[Microsoft.Xrm.Sdk.Cl" +
-                    "ient.EntityLogicalNameAttribute(\"");
+            this.Write("\r\n\t\t[System.Runtime.Serialization.DataContractAttribute()]\r\n\t\t[Microsoft.Xrm.Sdk." +
+                    "Client.EntityLogicalNameAttribute(\"");
             
             #line 34 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.LogicalName));
@@ -89,8 +88,14 @@ foreach (var entity in Metadata)
             
             #line default
             #line hidden
-            this.Write("Table() : \r\n\t\t\t\t\tbase(EntityLogicalName)\r\n\t\t\t{\r\n\t\t\t}\r\n\t\r\n\t\t\tpublic const string E" +
-                    "ntityLogicalName = \"");
+            this.Write("Table() : \r\n\t\t\t\t\tbase(\"");
+            
+            #line 39 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\")\r\n\t\t\t{\r\n\t\t\t}\r\n\t\r\n\t\t\tpublic const string EntityLogicalName = \"");
             
             #line 43 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.LogicalName));
@@ -229,8 +234,15 @@ if(attribute.LogicalName == entity.entityMetadata.PrimaryIdAttribute)
             
             #line default
             #line hidden
-            this.Write("\")]\r\n\t\t\t\t\tpublic override System.Guid Id\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tget\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tretu" +
-                    "rn base.Id;\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tset\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tthis.");
+            this.Write("\")]\r\n\t\t\t\t\tpublic override Guid Id\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tget\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\treturn this" +
+                    ".GetAttributeValue<Guid>(\"");
+            
+            #line 114 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\");\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tset\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tthis.");
             
             #line 118 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attributeName));
@@ -507,9 +519,38 @@ if(attribute.IsValidForUpdate == true || attribute.IsValidForCreate == true)
             
             #line default
             #line hidden
-            this.Write("\r\n{\r\n\tusing Entities;\r\n\r\n\t");
+            this.Write("\r\n{\r\n\tusing Entities;\r\n\tpublic static class Tables\r\n\t{\r\n\t");
             
-            #line 206 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 207 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+foreach (var entity in Metadata)
+	{
+            
+            #line default
+            #line hidden
+            this.Write("\t\tpublic static string ");
+            
+            #line 209 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
+            
+            #line default
+            #line hidden
+            this.Write(" = \"");
+            
+            #line 209 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.LogicalName));
+            
+            #line default
+            #line hidden
+            this.Write("\";\r\n\t");
+            
+            #line 210 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("\t}\r\n\t");
+            
+            #line 212 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 foreach (var entity in Metadata)
 	{
             
@@ -517,7 +558,7 @@ foreach (var entity in Metadata)
             #line hidden
             this.Write("\t\t");
             
-            #line 208 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 214 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 foreach (var optionMetadata in entity.optionMetadata)
 		{
             
@@ -525,21 +566,21 @@ foreach (var optionMetadata in entity.optionMetadata)
             #line hidden
             this.Write("\t\t\t[System.Runtime.Serialization.DataContractAttribute()]\r\n\t\t\tpublic enum ");
             
-            #line 211 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 217 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
             #line hidden
             this.Write("_");
             
-            #line 211 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 217 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(optionMetadata.attributeName));
             
             #line default
             #line hidden
             this.Write("\r\n\t\t\t{\r\n\t\t\t\t");
             
-            #line 213 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 219 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 foreach (var option in optionMetadata.options)
 				{
 				
@@ -548,35 +589,35 @@ foreach (var option in optionMetadata.options)
             #line hidden
             this.Write("\t\t\t\t\t[System.Runtime.Serialization.EnumMemberAttribute()]\r\n\t\t\t\t\t");
             
-            #line 217 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 223 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(option.Label));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 217 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 223 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(option.Value));
             
             #line default
             #line hidden
             this.Write(",\r\n\t\t\t\t");
             
-            #line 218 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 224 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("\t\t\t}\t\t\t\r\n\t\t");
             
-            #line 220 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 226 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 }
             
             #line default
             #line hidden
             this.Write("\t");
             
-            #line 221 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 227 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 }
             
             #line default
@@ -608,7 +649,7 @@ foreach (var option in optionMetadata.options)
 
 		");
             
-            #line 247 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 253 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
  foreach (var entity in Metadata)
 		{
 		
@@ -617,21 +658,21 @@ foreach (var option in optionMetadata.options)
             #line hidden
             this.Write("\t\tpublic IQueryable<");
             
-            #line 250 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 256 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Namespace));
             
             #line default
             #line hidden
             this.Write(".Entities.");
             
-            #line 250 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 256 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
             #line hidden
             this.Write("Table> ");
             
-            #line 250 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 256 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
@@ -639,21 +680,21 @@ foreach (var option in optionMetadata.options)
             this.Write("\r\n\t\t{\r\n\t\t\t[System.Diagnostics.DebuggerNonUserCode()]\r\n\t\t\tget\r\n\t\t\t{\r\n\t\t\t\treturn th" +
                     "is.CreateQuery<");
             
-            #line 255 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 261 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(this.Namespace));
             
             #line default
             #line hidden
             this.Write(".Entities.");
             
-            #line 255 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 261 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entity.entityMetadata.SchemaName));
             
             #line default
             #line hidden
             this.Write("Table>();\r\n\t\t\t}\r\n\t\t}\r\n\t\t");
             
-            #line 258 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+            #line 264 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 }
             
             #line default
@@ -664,7 +705,7 @@ foreach (var option in optionMetadata.options)
             return this.GenerationEnvironment.ToString();
         }
         
-        #line 271 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+        #line 277 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 
 public string Namespace { get; set; }
 
@@ -674,7 +715,7 @@ public string TypeName { get; set; }
         #line default
         #line hidden
         
-        #line 277 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
+        #line 283 "D:\GitHub\Dataverse-LINQPad-Driver\src\CDSTemplate.tt"
 
 string GetTypeFromCode(AttributeTypeCode? attributeTypeCode)
 {

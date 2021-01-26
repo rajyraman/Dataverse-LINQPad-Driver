@@ -25,18 +25,18 @@ using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Messages;
 
 [assembly: Microsoft.Xrm.Sdk.Client.ProxyTypesAssemblyAttribute()]
-
 namespace <#=this.Namespace#>.Entities
 {
 	<#foreach (var entity in Metadata)
 	{#>
+
 		[System.Runtime.Serialization.DataContractAttribute()]
 		[Microsoft.Xrm.Sdk.Client.EntityLogicalNameAttribute("<#=entity.entityMetadata.LogicalName#>")]
 		public partial class <#=entity.entityMetadata.SchemaName#>Table : Microsoft.Xrm.Sdk.Entity, System.ComponentModel.INotifyPropertyChanging, System.ComponentModel.INotifyPropertyChanged
 		{
 	
 			public <#=entity.entityMetadata.SchemaName#>Table() : 
-					base(EntityLogicalName)
+					base("<#=entity.entityMetadata.LogicalName#>")
 			{
 			}
 	
@@ -107,11 +107,11 @@ namespace <#=this.Namespace#>.Entities
 						}
 					}
 					[AttributeLogicalNameAttribute("<#=attribute.LogicalName#>")]
-					public override System.Guid Id
+					public override Guid Id
 					{
 						get
 						{
-							return base.Id;
+							return this.GetAttributeValue<Guid>("<#=attribute.LogicalName#>");
 						}
 						set
 						{
@@ -202,7 +202,13 @@ namespace <#=this.Namespace#>.Entities
 namespace <#= this.Namespace #>
 {
 	using Entities;
-
+	public static class Tables
+	{
+	<#foreach (var entity in Metadata)
+	{#>
+		public static string <#=entity.entityMetadata.SchemaName#> = "<#=entity.entityMetadata.LogicalName#>";
+	<#}#>
+	}
 	<#foreach (var entity in Metadata)
 	{#>
 		<#foreach (var optionMetadata in entity.optionMetadata)
