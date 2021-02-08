@@ -34,7 +34,6 @@ namespace NY.Dataverse.LINQPadDriver
             var count = fetchXml.Attribute(FetchAttributes.Count)?.Value;
             var mainAttributes = entityElement.Elements(FetchAttributes.Attribute).Select(x => x.Attribute(FetchAttributes.Name).Value);
             var mainSortings = entityElement.Elements(FetchAttributes.Order).Select(x => (name: x.Attribute(FetchAttributes.Attribute).Value, descending: x.Attribute(FetchAttributes.Descending)?.Value, ascending: x.Attribute(FetchAttributes.Ascending)?.Value));
-
             var linkEntities = entityElement.Elements(FetchAttributes.LinkEntity);
             var filters = entityElement.Descendants(FetchAttributes.Filter);
             var topLevelFilter = filters.Count() > 1 ? filters.Skip(1) : filters;
@@ -45,9 +44,7 @@ namespace NY.Dataverse.LINQPadDriver
                 hasLevel2LinkEntity = linkEntities.Any(l => l.Element(FetchAttributes.LinkEntity) != null);
             }
             if (topLevelFilter?.Elements().Any() == true)
-            {
-                filter = BuildFilter(topLevelFilter.Take(1), mainAttributes, linkEntities, entityMetadata, expand);
-            }
+                filter = BuildFilter(filters.Reverse(), mainAttributes, linkEntities, entityMetadata, expand);
             var correctedMainAttributes = from a in mainAttributes
                                           join a1 in mainEntity.Attributes on a equals a1.LogicalName
                                           select (a1.AttributeType == AttributeTypeCode.Lookup || a1.AttributeType == AttributeTypeCode.Customer || a1.AttributeType == AttributeTypeCode.Owner) ? $"_{a}_value" : a;
@@ -78,28 +75,45 @@ namespace NY.Dataverse.LINQPadDriver
             return !hasLevel2LinkEntity ? new Hyperlinq(url).Dump("WebAPI URL") : null;
         }
 
-        // You can define other methods, fields, classes and namespaces here
-
         private static string BuildFilter(IEnumerable<XElement> topLevelFilter, IEnumerable<string> mainAttributes, IEnumerable<XElement> linkEntities, List<EntityMetadata> entityMetadata, string expand)
         {
-            var filterList = new List<string>();
             var filter = "";
-            var topFilterOperator = topLevelFilter.ElementAt(0).Attribute(FetchAttributes.Type)?.Value ?? "and";
-            var concatFilters = topLevelFilter.Select(f =>
+            var conditionsList = new List<string>();
+            var groupedConditions = new List<string>();
+            var i = 1;
+            var filterCount = topLevelFilter.Count();
+            if (filterCount > 1)
+                topLevelFilter = topLevelFilter.Take(filterCount - 1);
+            foreach (var f in topLevelFilter)
             {
                 var filterType = f.Attribute(FetchAttributes.Type)?.Value ?? "and";
-                var filters = f.Elements(FetchAttributes.Filter).Select(fi => BuildConditions(fi.Elements(FetchAttributes.Condition), linkEntities, entityMetadata));
-                var conditions = BuildConditions(f.Elements(FetchAttributes.Condition), linkEntities, entityMetadata);
-                if (filters.Any() && !string.IsNullOrEmpty(conditions))
-                    return $"{conditions} {filterType} {string.Join($" {filterType} ", filters)}";
-                if (filters.Any() && string.IsNullOrEmpty(conditions))
-                    return $"{string.Join($" {filterType} ", filters)}";
-                else if (!string.IsNullOrEmpty(conditions))
-                    return conditions;
-                else return "";
-            });
-            filter = string.Join($" {topFilterOperator} ", concatFilters);
-            if (filterList.Any() || !string.IsNullOrEmpty(filter))
+                var conditions = BuildConditions(filterType, f.Elements(FetchAttributes.Condition), linkEntities, entityMetadata);
+                if (!string.IsNullOrEmpty(conditions) && !f.Elements(FetchAttributes.Filter).Any())
+                {
+                    conditionsList.Add(conditions);
+                }
+                if (conditionsList.Any() && (i == topLevelFilter.Count() || f.Elements(FetchAttributes.Filter).Any()))
+                {
+                    if (!string.IsNullOrEmpty(conditions))
+                    {
+                        if (f.Elements(FetchAttributes.Filter).Any())
+                            filter += ($"({conditions} {filterType} (" + string.Join($" {filterType} ", conditionsList)) + "))";
+                        else
+                            filter += conditions;
+                        groupedConditions.Add(($"({conditions} {filterType} (" + string.Join($" {filterType} ", conditionsList)) + "))");
+                        conditionsList.Clear();
+                    }
+                    else
+                    {
+                        groupedConditions.AddRange(conditionsList);
+                        groupedConditions.Reverse();
+                        filter = string.Join($" {filterType} ", groupedConditions);
+                        groupedConditions.Clear();
+                    }
+                }
+                i++;
+            }
+            if (!string.IsNullOrEmpty(filter))
             {
                 filter = $"{(mainAttributes.Any() || !string.IsNullOrEmpty(expand) ? "&" : "")}$filter=({filter})";
             }
@@ -132,9 +146,9 @@ namespace NY.Dataverse.LINQPadDriver
             return expand;
         }
 
-        private static string BuildConditions(IEnumerable<XElement> conditions, IEnumerable<XElement> linkEntities, List<EntityMetadata> entityMetadata)
+        private static string BuildConditions(string filterType, IEnumerable<XElement> conditions, IEnumerable<XElement> linkEntities, List<EntityMetadata> entityMetadata)
         {
-            var andConditions = string.Join(" and ", conditions.Select(c =>
+            var andConditions = string.Join($" {filterType} ", conditions.Select(c =>
             {
                 var conditionOperator = c.Attribute(FetchAttributes.Operator)?.Value;
                 var conditionEntity = c.Attribute(FetchAttributes.EntityName)?.Value;
@@ -180,17 +194,20 @@ namespace NY.Dataverse.LINQPadDriver
                     likeFunction = "endswith";
                     attributeValue = attributeValue.Substring(1);
                 }
-                switch (attributeMetadata.AttributeType)
+                if (!string.IsNullOrEmpty(attributeValue))
                 {
-                    case AttributeTypeCode.String:
-                        attributeValue = $"'{attributeValue}'";
-                        break;
-                    case AttributeTypeCode.Boolean:
-                        attributeValue = attributeValue == "1" ? "true" : "false";
-                        break;
-                    case AttributeTypeCode.DateTime:
-                        attributeValue = DateTime.Parse(attributeValue).ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
-                        break;
+                    switch (attributeMetadata.AttributeType)
+                    {
+                        case AttributeTypeCode.String:
+                            attributeValue = $"'{attributeValue}'";
+                            break;
+                        case AttributeTypeCode.Boolean:
+                            attributeValue = attributeValue == "1" ? "true" : "false";
+                            break;
+                        case AttributeTypeCode.DateTime:
+                            attributeValue = DateTime.Parse(attributeValue).ToUniversalTime().ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+                            break;
+                    }
                 }
                 switch (conditionOperator)
                 {
