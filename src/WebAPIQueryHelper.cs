@@ -55,7 +55,10 @@ namespace NY.Dataverse.LINQPadDriver
             if (!string.IsNullOrEmpty(filter))
             {
                 url += filter;
-                url += $" and ({BuildLinkEntityJoinConditions(mainEntity.LogicalName, linkEntities, entityMetadata)})";
+                if (linkEntities.Any())
+                {
+                    url += $" and ({BuildLinkEntityJoinConditions(mainEntity.LogicalName, linkEntities, entityMetadata)})";
+                }
             }
             else
             {
