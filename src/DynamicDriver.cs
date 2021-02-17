@@ -168,9 +168,8 @@ namespace NY.Dataverse.LINQPadDriver
                     Query = query
                 };
                 var organizationResponse = (QueryExpressionToFetchXmlResponse)_cdsClient.Execute(expressionToFetchXmlRequest);
-				var fetchXml = XElement.Parse(organizationResponse.FetchXml);
 				WebAPIQueryHelper.BuildWebApiUrl(_cdsClient, organizationResponse.FetchXml);
-				_queryExecutionManager?.SqlTranslationWriter.WriteLine(fetchXml.ToString());
+				_queryExecutionManager?.SqlTranslationWriter.WriteLine(XElement.Parse(organizationResponse.FetchXml).ToString());
             }
 		}
 

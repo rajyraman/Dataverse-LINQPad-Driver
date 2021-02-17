@@ -17,6 +17,6 @@
 </Query>
 
 (from s in SavedQuery
- where s.QueryType == 0 && s.ReturnedTypeCode == AccountTable.EntityLogicalName
- orderby s.CreatedOn
- select new { EntityName = s.ReturnedTypeCode, CreatedBy = s.CreatedBy.Name, CreatedOn = s.CreatedOn }).Take(1)
+where s.QueryType == 0 && s.ReturnedTypeCode == Tables.Account
+orderby s.CreatedOn
+select new { EntityName = s.ReturnedTypeCode, CreatedBy = s.CreatedBy.Name, CreatedOn = s.CreatedOn }).Take(1)

@@ -20,7 +20,8 @@
     <PackageProjectUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Show WebAPI URL from LINQ.</PackageReleaseNotes>
+    <PackageReleaseNotes>1. Show WebAPI URL from LINQ.
+2. Update Microsoft.PowerPlatform.Cds.Client to 0.3.10-Alpha</PackageReleaseNotes>
     <PackageIcon>LINQPadDriver.png</PackageIcon>
     <PackageIconUrl />
     <Copyright>Natraj Yegnaraman</Copyright>
@@ -59,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LINQPad.Reference" Version="1.2.0-beta" />
-    <PackageReference Include="Microsoft.PowerPlatform.Cds.Client" Version="0.3.6-Alpha" />
+    <PackageReference Include="Microsoft.PowerPlatform.Cds.Client" Version="0.3.10-Alpha" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />

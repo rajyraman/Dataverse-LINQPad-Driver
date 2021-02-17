@@ -36,7 +36,7 @@ namespace NY.Dataverse.LINQPadDriver
             var mainSortings = entityElement.Elements(FetchAttributes.Order).Select(x => (name: x.Attribute(FetchAttributes.Attribute).Value, descending: x.Attribute(FetchAttributes.Descending)?.Value, ascending: x.Attribute(FetchAttributes.Ascending)?.Value));
             var linkEntities = entityElement.Elements(FetchAttributes.LinkEntity);
             var filters = entityElement.Descendants(FetchAttributes.Filter);
-            var topLevelFilter = filters.Count() > 1 ? filters.Skip(1) : filters;
+            var topLevelFilter = filters.Count() > 1 && filters.First().Element(FetchAttributes.Condition) == null ? filters.Skip(1) : filters;
 
             if (linkEntities.Any())
             {
@@ -77,41 +77,87 @@ namespace NY.Dataverse.LINQPadDriver
 
         private static string BuildFilter(IEnumerable<XElement> topLevelFilter, IEnumerable<string> mainAttributes, IEnumerable<XElement> linkEntities, List<EntityMetadata> entityMetadata, string expand)
         {
-            var filter = "";
             var conditionsList = new List<string>();
-            var groupedConditions = new List<string>();
-            var i = 1;
-            var filterCount = topLevelFilter.Count();
-            if (filterCount > 1)
-                topLevelFilter = topLevelFilter.Take(filterCount - 1);
+            var newConditionsList = new List<string>();
+            var filter = "";
+            var filterOperator = "and";
+            var concatCondition = "";
             foreach (var f in topLevelFilter)
             {
-                var filterType = f.Attribute(FetchAttributes.Type)?.Value ?? "and";
-                var conditions = BuildConditions(filterType, f.Elements(FetchAttributes.Condition), linkEntities, entityMetadata);
-                if (!string.IsNullOrEmpty(conditions) && !f.Elements(FetchAttributes.Filter).Any())
+                filterOperator = f.Attribute(FetchAttributes.Type)?.Value ?? "and";
+                var conditions = f.Elements(FetchAttributes.Condition);
+                var conditionsToUse = f.Elements(FetchAttributes.Filter)
+                                        .Where(x => x.Element(FetchAttributes.Filter) == null)
+                                        .Select(xe => BuildConditions(xe.Attribute(FetchAttributes.Type)?.Value ?? "and", xe.Elements(FetchAttributes.Condition), linkEntities, entityMetadata))
+                                        .ToList();
+                if (conditions.Any())
                 {
-                    conditionsList.Add(conditions);
-                }
-                if (conditionsList.Any() && (i == topLevelFilter.Count() || f.Elements(FetchAttributes.Filter).Any()))
-                {
-                    if (!string.IsNullOrEmpty(conditions))
+                    concatCondition = BuildConditions(filterOperator, conditions, linkEntities, entityMetadata);
+                    if (conditionsToUse.Contains(concatCondition))
+                        concatCondition = "";
+                    if (f.Element(FetchAttributes.Filter) != null)
                     {
-                        if (f.Elements(FetchAttributes.Filter).Any())
-                            filter += ($"({conditions} {filterType} (" + string.Join($" {filterType} ", conditionsList)) + "))";
-                        else
-                            filter += conditions;
-                        groupedConditions.Add(($"({conditions} {filterType} (" + string.Join($" {filterType} ", conditionsList)) + "))");
-                        conditionsList.Clear();
+                        var newConcatConditions = "";
+                        if (conditionsList.Any())
+                        {
+                            var joinedConditions = string.Join($" {filterOperator} ", conditionsToUse);
+                            newConcatConditions = $"({concatCondition} {filterOperator} ({joinedConditions}))";
+                            concatCondition = "";
+                            conditionsToUse.ForEach(c => conditionsList.Remove(c));
+                        }
+                        if (newConditionsList.Any())
+                        {
+                            newConcatConditions = $"({concatCondition} {filterOperator} {newConditionsList.First()})";
+                            concatCondition = "";
+                            newConditionsList.Clear();
+                        }
+                        newConditionsList.Add(newConcatConditions);
                     }
                     else
                     {
-                        groupedConditions.AddRange(conditionsList);
-                        groupedConditions.Reverse();
-                        filter = string.Join($" {filterType} ", groupedConditions);
-                        groupedConditions.Clear();
+                        conditionsList.Add(concatCondition);
+                        concatCondition = "";
                     }
                 }
-                i++;
+                else
+                {
+                    conditionsList.RemoveAll(x => x == null);
+
+                    conditionsToUse.ForEach(c => conditionsList.Remove(c));
+                    if (conditionsToUse.Any())
+                    {
+                        conditionsList.Reverse();
+                        newConditionsList.Add(string.Join($" {filterOperator} ", conditionsToUse));
+                        conditionsToUse.Clear();
+                        if (conditionsList.Contains(concatCondition))
+                            concatCondition = "";
+                    }
+                    if (newConditionsList.Any())
+                    {
+                        newConditionsList.Reverse();
+                        if (newConditionsList.Count > 1)
+                            filter = $"({(string.Join($" {filterOperator} ", newConditionsList))})";
+                        else
+                            filter = string.Join($" {filterOperator} ", newConditionsList);
+                        if (newConditionsList.Contains(concatCondition))
+                            concatCondition = "";
+                    }
+                    newConditionsList.Clear();
+                    conditionsList.Clear();
+                    newConditionsList.Add(filter);
+                }
+            }
+            if (newConditionsList.Any())
+            {
+                filter = string.Join($" {filterOperator} ", newConditionsList);
+                if (!string.IsNullOrEmpty(concatCondition))
+                {
+                    filter = $"{concatCondition} {filterOperator} {filter}";
+                }
+            }
+            else if (conditionsList.Any())
+            {
+                filter = string.IsNullOrEmpty(filter) ? string.Join($" {filterOperator} ", conditionsList) : $"({conditionsList.First()}) {filterOperator} ({filter})";
             }
             if (!string.IsNullOrEmpty(filter))
             {

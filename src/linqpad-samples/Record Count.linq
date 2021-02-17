@@ -20,8 +20,8 @@
 var entities = (from e in DataverseClient.GetAllEntityMetadata()
 where e.IsCustomizable.Value == true &&
 e.DataProviderId == null &&
-e.LogicalName != UserQueryTable.EntityLogicalName &&
-e.LogicalName != UserQueryVisualizationTable.EntityLogicalName
+e.LogicalName != Tables.UserQuery &&
+e.LogicalName != Tables.UserQueryVisualization
 select e.LogicalName).ToArray();
 ((RetrieveTotalRecordCountResponse)this.DataverseClient.Execute(
 new RetrieveTotalRecordCountRequest
