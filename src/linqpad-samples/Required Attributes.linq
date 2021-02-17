@@ -16,7 +16,7 @@
   </Connection>
 </Query>
 
-from a in this.DataverseClient.GetAllAttributesForEntity(AccountTable.EntityLogicalName)
+from a in this.DataverseClient.GetAllAttributesForEntity(Tables.Account)
 where a.RequiredLevel.Value != AttributeRequiredLevel.SystemRequired
 orderby a.LogicalName
 select new { a.LogicalName, a.SchemaName, a.AttributeType }
