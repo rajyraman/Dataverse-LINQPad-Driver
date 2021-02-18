@@ -7,14 +7,17 @@ using System.Text;
 using System.Linq;
 using System.Xml.Linq;
 using LINQPad;
+using System.Diagnostics;
 
 namespace NY.Dataverse.LINQPadDriver
 {
     public class WebAPIQueryHelper
     {
-        public static Hyperlinq BuildWebApiUrl(CdsServiceClient DataverseClient, string query)
+        public static string BuildWebApiUrl(CdsServiceClient DataverseClient, string query)
         {
-
+#if DEBUG
+            Debugger.Launch();
+#endif
             var hasLevel2LinkEntity = false;
             var expand = "";
             var filter = "";
@@ -75,7 +78,7 @@ namespace NY.Dataverse.LINQPadDriver
                 var orders = string.Join(",", mainSortings.Select(o => $"{o.name}{(o.ascending ?? (o.descending != null ? " desc" : " asc"))}"));
                 url += ($"{(mainAttributes.Any() || !string.IsNullOrEmpty(expand) || !string.IsNullOrEmpty(filter) || !string.IsNullOrEmpty(top) || !string.IsNullOrEmpty(count) ? "&" : "")}$orderby={orders}");
             }
-            return !hasLevel2LinkEntity ? new Hyperlinq(url).Dump("WebAPI URL") : null;
+            return !hasLevel2LinkEntity ? url : null;
         }
 
         private static string BuildFilter(IEnumerable<XElement> topLevelFilter, IEnumerable<string> mainAttributes, IEnumerable<XElement> linkEntities, List<EntityMetadata> entityMetadata, string expand)
@@ -177,10 +180,8 @@ namespace NY.Dataverse.LINQPadDriver
                 if (linkAttributes.Any())
                 {
                     var linkEntityMetadata = entityMetadata.SingleOrDefault(e => e.LogicalName == l.Attribute(FetchAttributes.Name).Value);
-
-                    var relationshipName = linkEntityMetadata?.OneToManyRelationships
-                                          ?.Where(x => x.ReferencingEntity == entityMetadata[0].LogicalName && x.ReferencingAttribute == l.Attribute(FetchAttributes.To).Value).FirstOrDefault();
-                    return relationshipName != null ? $@"{relationshipName?.ReferencingEntityNavigationPropertyName}($select={string.Join(",", linkAttributes.Select(a => {
+                    var linkEntityRelationshipName = entityMetadata.RelationshipDetails(entityMetadata[0].LogicalName, l.Attribute(FetchAttributes.From).Value, linkEntityMetadata.LogicalName, l.Attribute(FetchAttributes.To).Value);
+                    return !string.IsNullOrEmpty(linkEntityRelationshipName.RelationshipName) ? $@"{linkEntityRelationshipName.RelationshipName}($select={string.Join(",", linkAttributes.Select(a => {
                         var attributeName = a.Attribute(FetchAttributes.Name).Value;
                         var attributeType = linkEntityMetadata.Attributes.Single(x => x.LogicalName == attributeName).AttributeType;
                         return attributeType == AttributeTypeCode.Customer || attributeType == AttributeTypeCode.Lookup || attributeType == AttributeTypeCode.Owner ? $"_{attributeName}_value" : attributeName;
@@ -188,6 +189,8 @@ namespace NY.Dataverse.LINQPadDriver
                 }
                 return "";
             }).ToList());
+            if (expand == ",") expand = "";
+
             if (!string.IsNullOrEmpty(expand))
             {
                 expand = $"{(mainAttributes.Any() ? "&" : "")}$expand=" + expand;
@@ -203,7 +206,8 @@ namespace NY.Dataverse.LINQPadDriver
                 var conditionEntity = c.Attribute(FetchAttributes.EntityName)?.Value;
                 var linkEntityFieldName = "";
                 var linkEntityName = "";
-                var linkEntityRelationshipName = "";
+                var mainEntityFieldName = "";
+                (string RelationshipName, string PrimaryKey) linkEntityRelationshipName = ("", "");
                 AttributeMetadata attributeMetadata = null;
                 var likeFunction = "contains";
 
@@ -211,10 +215,9 @@ namespace NY.Dataverse.LINQPadDriver
                 {
                     var linkEntity = linkEntities.SingleOrDefault(e => e.Attribute(FetchAttributes.Alias).Value == conditionEntity);
                     linkEntityFieldName = linkEntity?.Attribute(FetchAttributes.To).Value ?? "";
+                    mainEntityFieldName = linkEntity?.Attribute(FetchAttributes.From).Value ?? "";
                     linkEntityName = linkEntity?.Attribute(FetchAttributes.Name).Value ?? "";
-                    linkEntityRelationshipName = (from e in entityMetadata
-                                                  where e.LogicalName == linkEntityName
-                                                  select e.OneToManyRelationships.Single(x => x.ReferencingEntity == entityMetadata[0].LogicalName && x.ReferencingAttribute == linkEntityFieldName)).FirstOrDefault()?.ReferencingEntityNavigationPropertyName;
+                    linkEntityRelationshipName = entityMetadata.RelationshipDetails(entityMetadata[0].LogicalName, mainEntityFieldName, linkEntityName, linkEntityFieldName);
                 }
                 var attributeValue = c.Attribute(FetchAttributes.AttributeValue)?.Value ?? "";
                 var attributeName = c.Attribute(FetchAttributes.Attribute)?.Value;
@@ -266,13 +269,13 @@ namespace NY.Dataverse.LINQPadDriver
                     case "le":
                     case "gt":
                     case "ge":
-                        return string.IsNullOrEmpty(linkEntityFieldName) ? $"{attributeName} {conditionOperator} {attributeValue}" : $"{linkEntityRelationshipName}/{attributeName} {conditionOperator} {attributeValue}";
+                        return string.IsNullOrEmpty(linkEntityFieldName) ? $"{attributeName} {conditionOperator} {attributeValue}" : $"{linkEntityRelationshipName.RelationshipName}/{attributeName} {conditionOperator} {attributeValue}";
                     case "null":
-                        return string.IsNullOrEmpty(linkEntityFieldName) ? $"{attributeName} eq null" : $"{linkEntityRelationshipName}/{attributeName} eq null";
+                        return string.IsNullOrEmpty(linkEntityFieldName) ? $"{attributeName} eq null" : $"{linkEntityRelationshipName.RelationshipName}/{attributeName} eq null";
                     case "not-null":
-                        return string.IsNullOrEmpty(linkEntityFieldName) ? $"{attributeName} ne null" : $"{linkEntityRelationshipName}/{attributeName} ne null";
+                        return string.IsNullOrEmpty(linkEntityFieldName) ? $"{attributeName} ne null" : $"{linkEntityRelationshipName.RelationshipName}/{attributeName} ne null";
                     case "not-like":
-                        return string.IsNullOrEmpty(linkEntityFieldName) ? $"{likeFunction}({attributeName},{attributeValue})" : $"not {likeFunction}({linkEntityRelationshipName}/{attributeName},{attributeValue})";
+                        return string.IsNullOrEmpty(linkEntityFieldName) ? $"{likeFunction}({attributeName},{attributeValue})" : $"not {likeFunction}({linkEntityRelationshipName.RelationshipName}/{attributeName},{attributeValue})";
                     case "like":
                         return string.IsNullOrEmpty(linkEntityFieldName) ? $"{likeFunction}({attributeName},{attributeValue})" : $"{likeFunction}({linkEntityRelationshipName}/{attributeName},{attributeValue})";
                     default:
@@ -286,11 +289,10 @@ namespace NY.Dataverse.LINQPadDriver
             var linkPrimaryAttributeConditions = string.Join(" and ", linkEntities.Select(en =>
             {
                 var linkEntityFieldName = en.Attribute(FetchAttributes.To).Value ?? "";
+                var mainEntityFieldName = en.Attribute(FetchAttributes.From).Value ?? "";
                 var linkEntityName = en.Attribute(FetchAttributes.Name).Value ?? "";
-                var linkEntityRelationshipName = (from e in entityMetadata
-                                                  where e.LogicalName == linkEntityName
-                                                  select new { RelationshipName = e.OneToManyRelationships.Single(x => x.ReferencingEntity == entityMetadata[0].LogicalName && x.ReferencingAttribute == linkEntityFieldName).ReferencingEntityNavigationPropertyName, PrimaryKey = e.PrimaryIdAttribute }).FirstOrDefault();
-                return $"{linkEntityRelationshipName.RelationshipName}/{linkEntityRelationshipName.PrimaryKey} ne null";
+                var linkEntityRelationshipName = entityMetadata.RelationshipDetails(entityMetadata[0].LogicalName, mainEntityFieldName, linkEntityName, linkEntityFieldName);
+                return !string.IsNullOrEmpty(linkEntityRelationshipName.RelationshipName) ? $"{linkEntityRelationshipName.RelationshipName}/{linkEntityRelationshipName.PrimaryKey} ne null" : $"{linkEntityRelationshipName.PrimaryKey} ne null";
             }));
             return linkPrimaryAttributeConditions;
         }

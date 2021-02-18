@@ -20,6 +20,7 @@ namespace NY.Dataverse.LINQPadDriver
         public static string Condition => "condition";
         public static string Type => "type";
         public static string To => "to";
+        public static string From => "from";
         public static string Operator => "operator";
         public static string EntityName => "entityname";
         public static string Alias => "alias";

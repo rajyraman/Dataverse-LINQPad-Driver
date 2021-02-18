@@ -168,9 +168,23 @@ namespace NY.Dataverse.LINQPadDriver
                     Query = query
                 };
                 var organizationResponse = (QueryExpressionToFetchXmlResponse)_cdsClient.Execute(expressionToFetchXmlRequest);
-				WebAPIQueryHelper.BuildWebApiUrl(_cdsClient, organizationResponse.FetchXml);
-				_queryExecutionManager?.SqlTranslationWriter.WriteLine(XElement.Parse(organizationResponse.FetchXml).ToString());
-            }
+				try
+				{
+					var webApiUrl = WebAPIQueryHelper.BuildWebApiUrl(_cdsClient, organizationResponse.FetchXml);
+					if (!string.IsNullOrEmpty(webApiUrl))
+					{
+						_queryExecutionManager?.SqlTranslationWriter.WriteLine($"***WebAPI Url***\n{webApiUrl}");
+					}
+				}
+				catch(Exception ex)
+                {
+					_queryExecutionManager?.SqlTranslationWriter.WriteLine($"***WebAPI Generation Exception***\n{ex.Message}");
+				}
+                finally
+                {
+					_queryExecutionManager?.SqlTranslationWriter.WriteLine($"\n***FetchXML***\n{XElement.Parse(organizationResponse.FetchXml)}\n");
+				}
+			}
 		}
 
 		private static List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> GetEntityMetadata(CdsServiceClient client)
