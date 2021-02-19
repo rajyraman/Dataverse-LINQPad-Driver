@@ -60,7 +60,7 @@ You can use _DataverseClient_ property to access the CdsServiceClient object. On
 
 Click on the SQL tab to see the corresponding FetchXML to the LINQ query.
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/linq%20to%20fetch.png width="1024" alt="LINQ to FetchXML" />
+<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/linq%20to%20fetch.png" width="1024" alt="LINQ to FetchXML" />
 
 # Thank You
 
