@@ -64,6 +64,7 @@ Click on the SQL tab to see the corresponding FetchXML to the LINQ query.
 
 # Thank You
 
+- [Mark Carrington](https://github.com/MarkMpn) for [FetchXML to WebAPI URL conversion logic](https://github.com/MarkMpn/MarkMpn.FetchXmlToWebAPI)
 - Kenichiro Nakamura for writing the original driver, that I still use
 - Gayan Perara for CRM Code Generator, which was the first one to use T4 templates for generating early bound classes
 - Jo Albahari for creating LINQPad
