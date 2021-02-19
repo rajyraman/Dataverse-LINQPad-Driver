@@ -170,7 +170,7 @@ namespace NY.Dataverse.LINQPadDriver
                 var organizationResponse = (QueryExpressionToFetchXmlResponse)_cdsClient.Execute(expressionToFetchXmlRequest);
 				try
 				{
-					var webApiUrl = WebAPIQueryHelper.BuildWebApiUrl(_cdsClient, organizationResponse.FetchXml);
+					var webApiUrl = WebAPIQueryHelper.GetWebApiUrl(_cdsClient, organizationResponse.FetchXml);
 					if (!string.IsNullOrEmpty(webApiUrl))
 					{
 						_queryExecutionManager?.SqlTranslationWriter.WriteLine($"***WebAPI Url***\n{webApiUrl}");
