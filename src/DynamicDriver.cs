@@ -1,7 +1,7 @@
 using LINQPad;
 using LINQPad.Extensibility.DataContext;
 using Microsoft.Crm.Sdk.Messages;
-using Microsoft.PowerPlatform.Cds.Client;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
@@ -18,7 +18,7 @@ namespace NY.Dataverse.LINQPadDriver
 	public class DynamicDriver : DynamicDataContextDriver
 	{
 		static DynamicDriver _driverInstance;
-		static CdsServiceClient _cdsClient;
+		static ServiceClient _dataverseServiceClient;
 		static QueryExecutionManager _queryExecutionManager;
 
 #if DEBUG
@@ -47,9 +47,9 @@ namespace NY.Dataverse.LINQPadDriver
 		{
 			return new string[]
 				{
-					"Microsoft.PowerPlatform.Cds.Client.dll",
-					"Microsoft.Cds.Sdk.dll",
-					"Microsoft.Cds.Sdk.Proxy.dll"
+					"Microsoft.PowerPlatform.Dataverse.Client.dll",
+					"Microsoft.Dataverse.Sdk.dll",
+					"Microsoft.Dataverse.Sdk.Proxy.dll"
 				};
 		}
 
@@ -63,7 +63,7 @@ namespace NY.Dataverse.LINQPadDriver
 #endif
 			var connectionProperties = new ConnectionProperties(cxInfo);
 			List<ExplorerItem> explorerItems = new List<ExplorerItem>();
-			var client = new CdsServiceClient(connectionProperties.ConnectionString);
+			var client = new ServiceClient(connectionProperties.ConnectionString);
 			if (client.IsReady)
             {
                 var entityMetadata = GetEntityMetadata(client);
@@ -106,19 +106,19 @@ namespace NY.Dataverse.LINQPadDriver
 		public override object[] GetContextConstructorArguments(IConnectionInfo cxInfo)
 		{
 			var connectionProperties = new ConnectionProperties(cxInfo);
-			var cdsServiceClient = _cdsClient ?? connectionProperties.GetCdsClient();
-			if (_cdsClient == null || !_cdsClient.Equals(cdsServiceClient))
+			var dataverseServiceClient = _dataverseServiceClient ?? connectionProperties.GetCdsClient();
+			if (_dataverseServiceClient == null || !_dataverseServiceClient.Equals(dataverseServiceClient))
 			{
-				_cdsClient = cdsServiceClient;
+				_dataverseServiceClient = dataverseServiceClient;
 			}
 			return new object[]
 			{
-				cdsServiceClient
+				dataverseServiceClient
 			};
 		}
 		public override ParameterDescriptor[] GetContextConstructorParameters(IConnectionInfo connectionInfo) => new[]
 		{
-			new ParameterDescriptor("cdsServiceClient", typeof(CdsServiceClient).FullName)
+			new ParameterDescriptor("dataverseServiceClient", typeof(ServiceClient).FullName)
 		};
 		public override IEnumerable<string> GetNamespacesToAdd(IConnectionInfo cxInfo) => new List<string>
 		{
@@ -133,14 +133,14 @@ namespace NY.Dataverse.LINQPadDriver
 			"Microsoft.Xrm.Sdk.Extensions",
 			"Microsoft.Xrm.Sdk.Linq",
 			"Microsoft.Xrm.Sdk.WebServiceClient",
-			"Microsoft.PowerPlatform.Cds.Client",
+			"Microsoft.PowerPlatform.Dataverse.Client",
 			"NY.Dataverse.LINQPadDriver.Entities"
 		};
 
 		static void Compile(string cSharpSourceCode, string outputFile, IConnectionInfo cxInfo)
 		{
 			var customAssemblies = new[]{
-				typeof(CdsServiceClient).Assembly.Location,
+				typeof(ServiceClient).Assembly.Location,
 				typeof(EntityReference).Assembly.Location,
 				typeof(AddAppComponentsRequest).Assembly.Location,
 			};
@@ -160,17 +160,17 @@ namespace NY.Dataverse.LINQPadDriver
         #region Helper Methods
 		private static void OnPreExecute(object sender, EventArgs e)
         {
-			if (_cdsClient != null)
+			if (_dataverseServiceClient != null)
 			{
 				QueryExpression query = (QueryExpression)e.GetType().GetProperty("query").GetValue(e);
                 var expressionToFetchXmlRequest = new QueryExpressionToFetchXmlRequest
                 {
                     Query = query
                 };
-                var organizationResponse = (QueryExpressionToFetchXmlResponse)_cdsClient.Execute(expressionToFetchXmlRequest);
+                var organizationResponse = (QueryExpressionToFetchXmlResponse)_dataverseServiceClient.Execute(expressionToFetchXmlRequest);
 				try
 				{
-					var webApiUrl = WebAPIQueryHelper.GetWebApiUrl(_cdsClient, organizationResponse.FetchXml);
+					var webApiUrl = WebAPIQueryHelper.GetWebApiUrl(_dataverseServiceClient, organizationResponse.FetchXml);
 					if (!string.IsNullOrEmpty(webApiUrl))
 					{
 						_queryExecutionManager?.SqlTranslationWriter.WriteLine($"***WebAPI Url***\n{webApiUrl}");
@@ -187,7 +187,7 @@ namespace NY.Dataverse.LINQPadDriver
 			}
 		}
 
-		private static List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> GetEntityMetadata(CdsServiceClient client)
+		private static List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> GetEntityMetadata(ServiceClient client)
         {
             return (from e in client.GetAllEntityMetadata(filter: EntityFilters.Attributes | EntityFilters.Entity | EntityFilters.Relationships)
                     orderby e.LogicalName

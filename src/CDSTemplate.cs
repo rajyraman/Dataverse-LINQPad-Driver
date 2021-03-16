@@ -45,7 +45,7 @@ using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Xrm.Sdk.Linq;
-using Microsoft.PowerPlatform.Cds.Client;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Messages;
 
@@ -629,7 +629,7 @@ foreach (var option in optionMetadata.options)
 
         public LINQPadOrganizationServiceContext(IOrganizationService service) : base(service)
         {
-            this.DataverseClient = (CdsServiceClient)service;
+            this.DataverseClient = (ServiceClient)service;
         }
 
         protected override void OnExecute(OrganizationRequest request, OrganizationResponse response)
@@ -641,7 +641,7 @@ foreach (var option in optionMetadata.options)
             base.OnExecute(request, response);
         }
 
-        public CdsServiceClient DataverseClient
+        public ServiceClient DataverseClient
         {
             get;
             private set;

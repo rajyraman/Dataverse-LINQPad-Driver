@@ -1,4 +1,4 @@
-﻿using Microsoft.PowerPlatform.Cds.Client;
+﻿using Microsoft.PowerPlatform.Dataverse.Client;
 using Microsoft.Xrm.Sdk.Discovery;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;
@@ -14,7 +14,7 @@ namespace NY.Dataverse.LINQPadDriver
 {
     public class WebAPIQueryHelper
     {
-        public static string GetWebApiUrl(CdsServiceClient DataverseClient, string query)
+        public static string GetWebApiUrl(ServiceClient DataverseClient, string query)
         {
             var url = $"{DataverseClient.ConnectedOrgPublishedEndpoints[EndpointType.WebApplication]}api/data/v{DataverseClient.ConnectedOrgVersion.Major}.{DataverseClient.ConnectedOrgVersion.Minor}";
             var fetchXml = XElement.Parse(query);

@@ -1,5 +1,5 @@
 using LINQPad.Extensibility.DataContext;
-using Microsoft.PowerPlatform.Cds.Client;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -96,9 +96,9 @@ namespace NY.Dataverse.LINQPadDriver
 			set => DriverData.SetElementValue("UserName", value);
 		}
 
-		public CdsServiceClient GetCdsClient()
+		public ServiceClient GetCdsClient()
 		{
-			return new CdsServiceClient(this.ConnectionString);
+			return new ServiceClient(this.ConnectionString);
 		}
     }
 }
