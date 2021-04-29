@@ -7,15 +7,13 @@ using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 
 namespace NY.Dataverse.LINQPadDriver
 {
-	public class DynamicDriver : DynamicDataContextDriver
+    public class DynamicDriver : DynamicDataContextDriver
 	{
 		static DynamicDriver _driverInstance;
 		static ServiceClient _dataverseServiceClient;
@@ -48,8 +46,8 @@ namespace NY.Dataverse.LINQPadDriver
 			return new string[]
 				{
 					"Microsoft.PowerPlatform.Dataverse.Client.dll",
-					"Microsoft.Dataverse.Sdk.dll",
-					"Microsoft.Dataverse.Sdk.Proxy.dll"
+					"Microsoft.Cds.Sdk.dll",
+					"Microsoft.Cds.Sdk.Proxy.dll"
 				};
 		}
 
@@ -142,7 +140,7 @@ namespace NY.Dataverse.LINQPadDriver
 			var customAssemblies = new[]{
 				typeof(ServiceClient).Assembly.Location,
 				typeof(EntityReference).Assembly.Location,
-				typeof(AddAppComponentsRequest).Assembly.Location,
+				typeof(AddAppComponentsRequest).Assembly.Location
 			};
 			var assembliesToReference = GetCoreFxReferenceAssemblies().Concat(customAssemblies);
 			// CompileSource is a static helper method to compile C# source code using LINQPad's built-in Roslyn libraries.

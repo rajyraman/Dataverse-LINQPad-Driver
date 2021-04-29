@@ -5,9 +5,9 @@
     <AssemblyName>NY.Dataverse.LINQPadDriver</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags>dataverse,linqpaddriver,commondataservice,powerapps,dynamics365</PackageTags>
-    <Version>1.6.4</Version>
-    <FileVersion>1.6.4.0</FileVersion>
-    <AssemblyVersion>1.6.4.0</AssemblyVersion>
+    <Version>1.6.5</Version>
+    <FileVersion>1.6.5.0</FileVersion>
+    <AssemblyVersion>1.6.5.0</AssemblyVersion>
     <Authors>Natraj Yegnaraman</Authors>
     <Company>Natraj Yegnaraman</Company>
     <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
@@ -20,8 +20,8 @@
     <PackageProjectUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>1. Update MarkMpn.FetchXmlToWebAPI submodule
-2. Move to PowerPlatform-DataverseServiceClient nuget package.</PackageReleaseNotes>
+    <PackageReleaseNotes>1. Update to Microsoft.PowerPlatform.Dataverse.Client 0.4.12
+2. Fix assembly references for Microsoft.Cds.Sdk.dll and Microsoft.Cds.Sdk.Proxy.dll</PackageReleaseNotes>
     <PackageIcon>LINQPadDriver.png</PackageIcon>
     <PackageIconUrl />
     <Copyright>Natraj Yegnaraman</Copyright>
@@ -66,7 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LINQPad.Reference" Version="1.2.0-beta" />
-    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="0.4.4" />
+    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="0.4.12" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
