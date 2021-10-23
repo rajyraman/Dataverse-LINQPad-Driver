@@ -10,9 +10,9 @@ The _Microsoft.PowerPlatform.Dataverse.Client_ package is still in alpha, so the
 
 You can install the driver from LINQPad from nuget. Click on View more drivers, and then choose "Show all drivers" and also select the _Include Prerelease_ checkbox. Search for Dataverse and you should be able to see the driver and install it.
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/newconnection.png" width="1024" alt="View more drivers" />
+<img src="https://raw.githubusercontent.com/rajyraman/Dataverse-LINQPad-Driver/master/images/newconnection.png" width="1024" alt="View more drivers" />
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/install.png" width="1024" alt="Install" />
+<img src="https://raw.githubusercontent.com/rajyraman/Dataverse-LINQPad-Driver/master/images/install.png" width="1024" alt="Install" />
 
 # Connecting to your Dataverse Environment
 
@@ -24,7 +24,7 @@ You can install the driver from LINQPad from nuget. Click on View more drivers, 
 
 After installing the driver from nuget, you can start using this driver by clicking _Add Connection_ link on LINQPad. You will be presented with the dialog below.
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/connection%20details.png" width="1024" alt="Connection Details" />
+<img src="https://raw.githubusercontent.com/rajyraman/Dataverse-LINQPad-Driver/master/images/connection%20details.png" width="1024" alt="Connection Details" />
 
 You can then choose the appropriate connection method and enter the connection details. [Scott Durow](https://twitter.com/scottdurow) has as great video on YouTube on how to do this, which you can use to setup your Application Registration and create the Application User. The redirect URL in the Application registration has to be **http://localhost**
 
@@ -36,31 +36,31 @@ If you don't want to set up a Azure AD App Registration, you can use the AppId p
 
 After entering the required details on the connection dialog, the context would be generated and you should see all the tables on the left hand side.
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/entities.png" width="1024" alt="Tables" />
+<img src="https://raw.githubusercontent.com/rajyraman/Dataverse-LINQPad-Driver/master/images/entities.png" width="1024" alt="Tables" />
 
 You can either write a new LINQ query on the query window, or right click on the table name, to see some quick suggestions.
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/queryoptions.png" width="1024" alt="Query Options" />
+<img src="https://raw.githubusercontent.com/rajyraman/Dataverse-LINQPad-Driver/master/images/queryoptions.png" width="1024" alt="Query Options" />
 
 LINQPad has a whole bunch of samples on how to craft your LINQ queries, in case you don't know how to query in LINQ and want to learn the syntax. LINQ is very similar to SQL in syntax, but more powerful than SQL.
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/samples.png" width="1024" alt="Samples" />
+<img src="https://raw.githubusercontent.com/rajyraman/Dataverse-LINQPad-Driver/master/images/samples.png" width="1024" alt="Samples" />
 
 I have also given five samples that illustrate the power of LINQPad and how you can use the driver to query Dataverse.
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/dataverse%20samples.png" width="1024" alt="Dataverse Sample" />
+<img src="https://raw.githubusercontent.com/rajyraman/Dataverse-LINQPad-Driver/master/images/dataverse%20samples.png" width="1024" alt="Dataverse Sample" />
 
 # Calling Dataverse API
 
 You can use _DataverseClient_ property to access the CdsServiceClient object. Once you have access to this object you can then basically do any operations that are supported by the client.
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/dataverseclient.png" width="1024" alt="Dataverse Client" />
+<img src="https://raw.githubusercontent.com/rajyraman/Dataverse-LINQPad-Driver/master/images/dataverseclient.png" width="1024" alt="Dataverse Client" />
 
 # Getting FetchXML from LINQ
 
 Click on the SQL tab to see the corresponding FetchXML to the LINQ query.
 
-<img src="https://github.com/rajyraman/Dataverse-LINQPad-Driver/raw/master/images/linq%20to%20fetch.png" width="1024" alt="LINQ to FetchXML" />
+<img src="https://raw.githubusercontent.com/rajyraman/Dataverse-LINQPad-Driver/master/images/linq%20to%20fetch.png" width="1024" alt="LINQ to FetchXML" />
 
 # Thank You
 
