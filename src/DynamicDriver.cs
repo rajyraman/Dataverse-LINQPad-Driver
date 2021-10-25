@@ -7,6 +7,8 @@ using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
@@ -46,7 +48,7 @@ namespace NY.Dataverse.LINQPadDriver
 			return new string[]
 				{
 					"Microsoft.PowerPlatform.Dataverse.Client.dll",
-					"Microsoft.Cds.Sdk.dll",
+					"Microsoft.Xrm.Sdk.dll",
 					"Microsoft.Cds.Sdk.Proxy.dll"
 				};
 		}

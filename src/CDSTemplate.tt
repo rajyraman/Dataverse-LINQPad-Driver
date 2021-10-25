@@ -291,8 +291,10 @@ string GetTypeFromCode(AttributeTypeCode? attributeTypeCode)
 			attributeType = "int";
 			break;
 		case AttributeTypeCode.Boolean:
-		case AttributeTypeCode.ManagedProperty:
 			attributeType = "bool";
+			break;
+		case AttributeTypeCode.ManagedProperty:
+			attributeType = "BooleanManagedProperty";
 			break;
 		case AttributeTypeCode.Customer:
 		case AttributeTypeCode.Lookup:	

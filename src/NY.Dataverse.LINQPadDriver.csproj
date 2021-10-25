@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWpf>true</UseWpf>
     <AssemblyName>NY.Dataverse.LINQPadDriver</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags>dataverse,linqpaddriver,commondataservice,powerapps,dynamics365</PackageTags>
-    <Version>1.6.6</Version>
-    <FileVersion>1.6.6.0</FileVersion>
-    <AssemblyVersion>1.6.6.0</AssemblyVersion>
+    <Version>1.6.7</Version>
+    <FileVersion>1.6.7.0</FileVersion>
+    <AssemblyVersion>1.6.7.0</AssemblyVersion>
     <Authors>Natraj Yegnaraman</Authors>
     <Company>Natraj Yegnaraman</Company>
     <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
@@ -20,8 +20,13 @@
     <PackageProjectUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>1. Update MarkMpn.FetchXmlToWebAPI submodule
-2. Update to Microsoft.PowerPlatform.Dataverse.Client 0.5.10</PackageReleaseNotes>
+    <PackageReleaseNotes>
+		1. Update MarkMpn.FetchXmlToWebAPI submodule
+        2. Update to Microsoft.PowerPlatform.Dataverse.Client 0.5.10
+        3. Fix type for BooleanManagedProperty
+        4. Fix reference to Microsoft.Xrm.Sdk.dll
+		5. Upgrade to .NET 5
+    </PackageReleaseNotes>
     <PackageIcon>LINQPadDriver.png</PackageIcon>
     <PackageIconUrl />
     <Copyright>Natraj Yegnaraman</Copyright>
