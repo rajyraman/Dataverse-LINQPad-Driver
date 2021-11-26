@@ -9,7 +9,7 @@ namespace NY.Dataverse.LINQPadDriver
     {
         public static string Sanitise(this string input)
         {
-            return new Regex("[^a-zA-Z0-9_]").Replace(string.Join("_", input.Split(" ")), "");
+            return new Regex("[^a-zA-Z0-9_\u4e00-\u9fa5a]").Replace(string.Join("_", input.Split(" ")), "");
         }
     }
 }
