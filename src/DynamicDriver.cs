@@ -199,11 +199,13 @@ namespace NY.Dataverse.LINQPadDriver
                                                                     var enumValue = x.SanitisedLabel;
                                                                     if (string.IsNullOrEmpty(x.SanitisedLabel))
                                                                     {
-                                                                        enumValue = $"_{x.Value}";
+																		//When the value is a negative number, replace '-' with '_'.
+																		enumValue = $"_{x.Value}".Replace("-","_");
                                                                     }
                                                                     else if (IsCSharpKeyword(enumValue) || char.IsDigit(enumValue[0]) || allOptions.Count(o => o.SanitisedLabel == x.SanitisedLabel) > 1)
                                                                     {
-                                                                        enumValue = $"_{enumValue}_{x.Value}";
+																		//When the value is a negative number, replace '-' with '_'.
+																		enumValue = $"_{enumValue}_{x.Value}".Replace("-", "_");
                                                                     }
                                                                     return (Label: enumValue, x.Value);
                                                                 }).ToList())).ToList()
