@@ -5,12 +5,12 @@
     <AssemblyName>NY.Dataverse.LINQPadDriver</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags>dataverse,linqpaddriver,commondataservice,powerapps,dynamics365</PackageTags>
-	<VersionPrefix>1.7.0</VersionPrefix>
+	<VersionPrefix>1.7.1</VersionPrefix>
     <Authors>Natraj Yegnaraman</Authors>
     <Company>Natraj Yegnaraman</Company>
     <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
     <Product>LINQPad Driver for Dataverse</Product>
-    <Description>This driver helps you connect to Dataverse (CDS) API and query or execute actions against the API. This driver utilises the .net core CDS assemblies to generate the early bound classes. The authentication methods supported are OAuth, Client Secret and Certificate Thumbprint.</Description>
+    <Description>This driver helps you connect to Dataverse (previous known as CDS) API and query or execute actions against the API. This driver utilises the PowerPlatform-DataverseServiceClient package to generate the early bound classes. The authentication methods supported are Azure, OAuth, Client Secret and Certificate Thumbprint.</Description>
     <RootNamespace>NY.Dataverse.LINQPadDriver</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>NY.Dataverse.LINQPadDriver.snk</AssemblyOriginatorKeyFile>
