@@ -10,6 +10,7 @@
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <l:BooleanToVisibilityInverseConvertor x:Key="BooleanToVisibilityInverseConvertor"/>        
         <l:StringToBooleanConvertor x:Key="StringToBooleanConvertor" />
     </Window.Resources>
     <StackPanel Margin="12" Orientation="Vertical">
@@ -18,15 +19,17 @@
                          IsChecked="{Binding AuthenticationType, Converter={StaticResource StringToBooleanConvertor}, ConverterParameter='ClientSecret'}">Client Secret</RadioButton>
             <RadioButton TabIndex="2" Padding="0 0 20 0" GroupName="rdoAuthenticationType" Name="certificate" 
                          IsChecked="{Binding AuthenticationType, Converter={StaticResource StringToBooleanConvertor}, ConverterParameter='Certificate'}">Certificate</RadioButton>
-            <RadioButton TabIndex="3" GroupName="rdoAuthenticationType" Name="oAuth"
+            <RadioButton TabIndex="3"  Padding="0 0 20 0" GroupName="rdoAuthenticationType" Name="oAuth"
                          IsChecked="{Binding AuthenticationType, Converter={StaticResource StringToBooleanConvertor}, ConverterParameter='OAuth'}">OAuth</RadioButton>
+            <RadioButton TabIndex="4" GroupName="rdoAzureAuthentication" Name="azure"
+                         IsChecked="{Binding AuthenticationType, Converter={StaticResource StringToBooleanConvertor}, ConverterParameter='Azure'}">Azure</RadioButton>            
         </StackPanel>
 
         <Label Padding="0,0,0,2" Margin="5">CDS Environment Url</Label>
         <TextBox Name="txtEnvironmentUrl" Padding="0,0,0,2" Margin="5,0,0,0" Text="{Binding EnvironmentUrl}" />
 
-        <Label Padding="0,0,0,2" Margin="5">Application Id</Label>
-        <TextBox Name="txtApplicationId" Padding="0,0,0,2" Margin="5,0,0,0" Text="{Binding ApplicationId}" />
+        <Label Padding="0,0,0,2" Margin="5" Visibility="{Binding Path=IsChecked, ElementName=azure, Converter={StaticResource BooleanToVisibilityInverseConvertor}}">Application Id</Label>
+        <TextBox Name="txtApplicationId" Padding="0,0,0,2" Margin="5,0,0,0"  Visibility="{Binding Path=IsChecked, ElementName=azure, Converter={StaticResource BooleanToVisibilityInverseConvertor}}" Text="{Binding ApplicationId}" />
 
         <Label Padding="0,0,0,2" Margin="5" Visibility="{Binding IsChecked, ElementName=clientSecret, Converter={StaticResource BooleanToVisibilityConverter}}">Client Secret</Label>
         <TextBox Name="txtClientSecret" Padding="0,0,0,2" Margin="5,0,0,0" Text="{Binding ClientSecret}"  Visibility="{Binding IsChecked, ElementName=clientSecret, Converter={StaticResource BooleanToVisibilityConverter}}"/>

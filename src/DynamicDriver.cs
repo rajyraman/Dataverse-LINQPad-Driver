@@ -1,3 +1,5 @@
+#define TRACE
+
 using LINQPad;
 using LINQPad.Extensibility.DataContext;
 using Microsoft.Crm.Sdk.Messages;
@@ -11,6 +13,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using System.Xml.Linq;
 
 namespace NY.Dataverse.LINQPadDriver
@@ -27,6 +30,7 @@ namespace NY.Dataverse.LINQPadDriver
 			// Uncomment the following code to attach to Visual Studio's debugger when an exception is thrown:
 			AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
 			{
+
 				if (args.Exception.StackTrace.Contains("NY.Dataverse.LINQPadDriver"))
 					Debugger.Launch();
 			};
@@ -47,6 +51,7 @@ namespace NY.Dataverse.LINQPadDriver
 		{
 			return new string[]
 				{
+					//"Azure.Identity.dll",
 					"Microsoft.PowerPlatform.Dataverse.Client.dll",
 					"Microsoft.Xrm.Sdk.dll",
 					"Microsoft.Cds.Sdk.Proxy.dll"
@@ -63,27 +68,45 @@ namespace NY.Dataverse.LINQPadDriver
 #endif
 			var connectionProperties = new ConnectionProperties(cxInfo);
 			List<ExplorerItem> explorerItems = new List<ExplorerItem>();
-			var client = new ServiceClient(connectionProperties.ConnectionString);
-			if (client.IsReady)
+			ServiceClient client = null;
+            try
             {
-                var entityMetadata = GetEntityMetadata(client);
-                var code = new CDSTemplate(entityMetadata) { Namespace = nameSpace, TypeName = typeName }.TransformText();
-#if DEBUG
-				File.WriteAllText(Path.Combine(GetContentFolder(), "LINQPad.EarlyBound.cs"), code);
-#endif
-                Compile(code, assemblyToBuild.CodeBase, cxInfo);
-
-                BuildEntityAndAttributeExplorerItems(explorerItems, entityMetadata);
-
-                foreach (var entity in entityMetadata)
+                client = connectionProperties.GetCdsClient();
+                if (client.IsReady)
                 {
-                    var source = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == entity.entityMetadata.LogicalName);
+                    var entityMetadata = GetEntityMetadata(client);
+                    var code = new CDSTemplate(entityMetadata) { Namespace = nameSpace, TypeName = typeName }.TransformText();
+#if DEBUG
+                    File.WriteAllText(Path.Combine(GetContentFolder(), "LINQPad.EarlyBound.cs"), code);
+#endif
+                    Compile(code, assemblyToBuild.CodeBase, cxInfo);
 
-                    BuildOneToManyRelationLinks(explorerItems, entity, source);
+                    BuildEntityAndAttributeExplorerItems(explorerItems, entityMetadata);
 
-                    BuildManyToOneRelationLinks(explorerItems, entity, source);
+                    foreach (var entity in entityMetadata)
+                    {
+                        var source = explorerItems.FirstOrDefault(e => e.Kind == ExplorerItemKind.QueryableObject && (string)e.Tag == entity.entityMetadata.LogicalName);
+
+                        BuildOneToManyRelationLinks(explorerItems, entity, source);
+
+                        BuildManyToOneRelationLinks(explorerItems, entity, source);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+				MessageBox.Show($"Error occured while attemoting to connect to {connectionProperties.EnvironmentUrl} using {connectionProperties.AuthenticationType}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+				if (client != null) 
+				{
+					var user = client.Retrieve("systemuser", client.GetMyUserId(), new ColumnSet("fullname","internalemailaddress"));
+					var email = user.GetAttributeValue<string>("internalemailaddress");
+					var userName = user.GetAttributeValue<string>("fullname");
+					MessageBox.Show($"Connected to {client.OrganizationDetail.FriendlyName} as {userName} ({email})", "Connected", MessageBoxButton.OK, MessageBoxImage.Information);
+				}
+			}
             return explorerItems;
 		}
 

@@ -1,8 +1,12 @@
+using Azure.Core;
+using Azure.Identity;
 using LINQPad.Extensibility.DataContext;
 using Microsoft.PowerPlatform.Dataverse.Client;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Caching;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace NY.Dataverse.LINQPadDriver
@@ -15,6 +19,7 @@ namespace NY.Dataverse.LINQPadDriver
 		public IConnectionInfo ConnectionInfo { get; private set; }
 		public string ContentPath { get; private set; }
 
+		static ObjectCache cache = MemoryCache.Default;
 
 		XElement DriverData => ConnectionInfo.DriverData;
 
@@ -77,7 +82,12 @@ namespace NY.Dataverse.LINQPadDriver
                     case "Certificate":
 						ClientSecret = null;
 						break;
-                    default:
+					case "Azure":
+						ApplicationId = null;
+						CertificateThumbprint = null;
+						ClientSecret = null;
+						break;
+					default:
 						CertificateThumbprint = null;
 						ClientSecret = null;
 						break;
@@ -98,7 +108,20 @@ namespace NY.Dataverse.LINQPadDriver
 
 		public ServiceClient GetCdsClient()
 		{
-			return new ServiceClient(this.ConnectionString);
+			return !string.IsNullOrEmpty(ConnectionString) ? new ServiceClient(ConnectionString) : new ServiceClient(tokenProviderFunction: f => GetToken(EnvironmentUrl), instanceUrl: new Uri(EnvironmentUrl));
 		}
-    }
+
+		private async Task<string> GetToken(string environment)
+		{
+			var credential = new DefaultAzureCredential();
+			//TokenProviderFunction is called multiple times, so we need to check if we already have a token in the cache
+			var accessToken = cache.Get(environment);
+			if (accessToken == null)
+			{
+				accessToken = (await credential.GetTokenAsync(new TokenRequestContext(new[] { $"{environment}/.default" })));
+				cache.Set(environment, accessToken, new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(50) });
+			}
+			return ((AccessToken)accessToken).Token;
+		}
+	}
 }

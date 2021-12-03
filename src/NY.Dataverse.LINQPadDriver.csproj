@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <UseWpf>true</UseWpf>
     <AssemblyName>NY.Dataverse.LINQPadDriver</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags>dataverse,linqpaddriver,commondataservice,powerapps,dynamics365</PackageTags>
-    <Version>1.6.9</Version>
-    <FileVersion>1.6.9.0</FileVersion>
-    <AssemblyVersion>1.6.9.0</AssemblyVersion>
+	<VersionPrefix>1.7.0</VersionPrefix>
     <Authors>Natraj Yegnaraman</Authors>
     <Company>Natraj Yegnaraman</Company>
     <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
@@ -20,10 +18,11 @@
     <PackageProjectUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>1. Update MarkMpn.FetchXmlToWebAPI submodule
-2. Update to Microsoft.PowerPlatform.Dataverse.Client 0.5.10
-3. Fix type for BooleanManagedProperty
-4. Fix reference to Microsoft.Xrm.Sdk.dll    </PackageReleaseNotes>
+    <PackageReleaseNotes>
+	1. Move to .NET 5.0
+	2. Add Azure authentication
+	3. Add error message for connection exception and success message after connection
+	</PackageReleaseNotes>
     <PackageIcon>LINQPadDriver.png</PackageIcon>
     <PackageIconUrl />
     <Copyright>Natraj Yegnaraman</Copyright>
@@ -72,6 +71,7 @@
     <Content Include="linqpad-samples\Webresource Images.linq" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.5.0" />
     <PackageReference Include="LINQPad.Reference" Version="1.2.0-beta" />
     <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="0.5.10" />
   </ItemGroup>

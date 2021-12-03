@@ -28,7 +28,6 @@ namespace NY.Dataverse.LINQPadDriver
 
             var converter = new FetchXmlToWebAPIConverter(new LINQPadMetadataProvider(entityMetadata), url);
             var webApiUrl = converter.ConvertFetchXmlToWebAPI(query);
-            new Hyperlinq(webApiUrl).Dump("WebAPI URL");
             return webApiUrl;
         }
     }
