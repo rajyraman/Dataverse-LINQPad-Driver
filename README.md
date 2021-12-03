@@ -78,4 +78,4 @@ If you click on the SQL tab, you can see both WebAPI URL and FetchXML that corre
 - [Kenichiro Nakamura](https://github.com/kenakamu) for writing the original CRM driver for LINQPad 4.
 - [Gayan Perara](https://www.linkedin.com/in/gperera/) for CRM Code Generator, which was the first one to use T4 templates for generating early bound classes
 - [Joe Albahari](http://www.albahari.com/) for creating LINQPad and providing Microsoft MVPs with Premium licence
-- People who helped me with testing - Tae Rim Han
+- People who helped me with testing - [Tae Rim Han](https://twitter.com/taerimhan)
