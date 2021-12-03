@@ -58,7 +58,7 @@ I have also given five samples that illustrate the power of LINQPad and how you 
 
 <img src="images/dataverse%20samples.png" alt="Dataverse Sample" />
 
-I highly recommend that you purchase [LINQPad Premium](https://www.linqpad.net/Purchase.aspx), as you get both Intellisense and Debugging capability. It is great for quick PoCs and experimentation.
+I highly recommend that you purchase [LINQPad Premium](https://www.linqpad.net/Purchase.aspx), as you get both Intellisense and Debugging capability. It is great for quick PoCs and experimentation. I currently get a free Premium licence as a Microsoft MVP, but I had paid for Premium licence even before I became a Microsoft MVP.
 
 # Calling Dataverse API
 
@@ -75,7 +75,7 @@ If you click on the SQL tab, you can see both WebAPI URL and FetchXML that corre
 # Thank You
 
 - [Mark Carrington](https://github.com/MarkMpn) for [FetchXML to WebAPI URL conversion logic](https://github.com/MarkMpn/MarkMpn.FetchXmlToWebAPI)
-- Kenichiro Nakamura for writing the original driver, that I still use
-- Gayan Perara for CRM Code Generator, which was the first one to use T4 templates for generating early bound classes
-- Jo Albahari for creating LINQPad
+- [Kenichiro Nakamura](https://github.com/kenakamu) for writing the original CRM driver for LINQPad 4.
+- [Gayan Perara](https://www.linkedin.com/in/gperera/) for CRM Code Generator, which was the first one to use T4 templates for generating early bound classes
+- [Joe Albahari](http://www.albahari.com/) for creating LINQPad and providing Microsoft MVPs with Premium licence
 - People who helped me with testing - Tae Rim Han
