@@ -1,4 +1,5 @@
 ﻿using Microsoft.PowerPlatform.Dataverse.Client;
+using Microsoft.PowerPlatform.Dataverse.Client.Extensions;
 using Microsoft.Xrm.Sdk.Discovery;
 using Microsoft.Xrm.Sdk.Metadata;
 using System;

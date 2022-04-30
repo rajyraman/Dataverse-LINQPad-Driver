@@ -4,6 +4,7 @@ using LINQPad;
 using LINQPad.Extensibility.DataContext;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.PowerPlatform.Dataverse.Client;
+using Microsoft.PowerPlatform.Dataverse.Client.Extensions;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
@@ -54,7 +55,7 @@ namespace NY.Dataverse.LINQPadDriver
 					//"Azure.Identity.dll",
 					"Microsoft.PowerPlatform.Dataverse.Client.dll",
 					"Microsoft.Xrm.Sdk.dll",
-					"Microsoft.Cds.Sdk.Proxy.dll"
+					"Microsoft.Crm.Sdk.Proxy.dll"
 				};
 		}
 
@@ -157,6 +158,7 @@ namespace NY.Dataverse.LINQPadDriver
 			"Microsoft.Xrm.Sdk.Linq",
 			"Microsoft.Xrm.Sdk.WebServiceClient",
 			"Microsoft.PowerPlatform.Dataverse.Client",
+			"Microsoft.PowerPlatform.Dataverse.Client.Extensions",
 			"NY.Dataverse.LINQPadDriver.Entities"
 		};
 
@@ -167,7 +169,7 @@ namespace NY.Dataverse.LINQPadDriver
 				typeof(EntityReference).Assembly.Location,
 				typeof(AddAppComponentsRequest).Assembly.Location
 			};
-			var assembliesToReference = GetCoreFxReferenceAssemblies().Concat(customAssemblies);
+			var assembliesToReference = GetCoreFxReferenceAssemblies(cxInfo).Concat(customAssemblies);
 			// CompileSource is a static helper method to compile C# source code using LINQPad's built-in Roslyn libraries.
 			// If you prefer, you can add a NuGet reference to the Roslyn libraries and use them directly.
 			var compileResult = CompileSource(new CompilationInput
@@ -216,7 +218,7 @@ namespace NY.Dataverse.LINQPadDriver
                     orderby e.LogicalName
                     select (entityMetadata: e, optionMetadata: (from attribute in e.Attributes.Where(a => a.AttributeType == AttributeTypeCode.State || a.AttributeType == AttributeTypeCode.Status || a.AttributeType == AttributeTypeCode.Picklist).OrderBy(a => a.LogicalName)
                                                                 let allOptions = from a in ((EnumAttributeMetadata)attribute).OptionSet.Options
-                                                                                 select new { a.Label, a.Value, SanitisedLabel = a.Label.UserLocalizedLabel.Label.Sanitise() }
+                                                                                 select new { a.Label, a.Value, SanitisedLabel = a.Label.UserLocalizedLabel?.Label.Sanitise() ?? "" }
                                                                 select (attributeName: attribute.SchemaName, options: allOptions.Select(x =>
                                                                 {
                                                                     var enumValue = x.SanitisedLabel;
