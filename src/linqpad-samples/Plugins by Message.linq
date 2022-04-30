@@ -22,6 +22,6 @@ join f in SdkMessageFilter on m.SdkMessageFilterId.Id equals f.SdkMessageFilterI
 join s in SdkMessage on f.SdkMessageId.Id equals s.SdkMessageId
 join p in PluginType on m.PluginTypeId.Id equals p.PluginTypeId
 where f.IsCustomProcessingStepAllowed
-&& !m.IsHidden
+&& !m.IsHidden.Value
 && m.CustomizationLevel == 1
 select new { EntityName = f.PrimaryObjectTypeCode, Message = s.Name, Rank = m.Rank, Stage = m.Stage, p.AssemblyName, PluginName = p.Name, StepName = m.Name, StepDescription = m.Description, m.StatusCode, m.FilteringAttributes }).ToList().OrderBy(x => x.EntityName).ThenBy(x => x.PluginName)
