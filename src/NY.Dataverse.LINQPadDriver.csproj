@@ -5,7 +5,7 @@
     <AssemblyName>NY.Dataverse.LINQPadDriver</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageTags>dataverse,linqpaddriver,commondataservice,powerapps,dynamics365</PackageTags>
-	<VersionPrefix>1.7.1</VersionPrefix>
+	<VersionPrefix>1.7.3</VersionPrefix>
     <Authors>Natraj Yegnaraman</Authors>
     <Company>Natraj Yegnaraman</Company>
     <PackageId>NY.Dataverse.LINQPadDriver</PackageId>
@@ -18,16 +18,17 @@
     <PackageProjectUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rajyraman/Dataverse-LINQPad-Driver</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>1. Update FetchXrmlToWebApi package
-2. Update Azure Identity, LINQPad and Dataverse Client packages</PackageReleaseNotes>
+    <PackageReleaseNotes>
+		1. Update FetchXrmlToWebApi package
+		2. Update Azure Identity (1.6.1), LINQPad and Dataverse Client (1.0.9) packages</PackageReleaseNotes>
     <PackageIcon>LINQPadDriver.png</PackageIcon>
     <PackageIconUrl />
     <Copyright>Natraj Yegnaraman</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.7.2</Version>
-    <AssemblyVersion>1.7.2.0</AssemblyVersion>
-    <FileVersion>1.7.2.0</FileVersion>    
+    <Version>1.7.3</Version>
+    <AssemblyVersion>1.7.3.0</AssemblyVersion>
+    <FileVersion>1.7.3.0</FileVersion>    
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="MarkMpn.FetchXmlToWebAPI\**" />
@@ -71,9 +72,9 @@
     <Content Include="linqpad-samples\Webresource Images.linq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.6.0" />
+    <PackageReference Include="Azure.Identity" Version="1.6.1" />
     <PackageReference Include="LINQPad.Reference" Version="1.3.0" />
-    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="0.6.6" />
+    <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client" Version="1.0.9" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
