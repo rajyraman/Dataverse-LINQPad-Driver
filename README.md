@@ -4,8 +4,6 @@
 
 This new driver is a dynamic driver that uses [Microsoft.PowerPlatform.Dataverse.Client](https://github.com/microsoft/PowerPlatform-DataverseServiceClient) assemblies which targets .NET 5. The Tables (Entities) and associated metadata are regenerated everytime LINQPad is opened, so that you don't need to worry about keeping Dataverse Metadata and LINQPad context in sync.
 
-The _Microsoft.PowerPlatform.Dataverse.Client_ package is still in alpha, so there might be some naming changes/bugs which you can log in this repo for me to triage. I can then either fix it in the driver, or report it on the _Microsoft.PowerPlatform.Dataverse.Client_ repo, if it is not a driver code issue.
-
 # Installing
 
 You can install the driver from LINQPad from nuget. Click on View more drivers, and then choose "Show all drivers". Search for Dataverse and you should be able to see the driver and install it.
