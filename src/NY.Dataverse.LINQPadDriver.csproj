@@ -20,7 +20,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>1. Update FetchXrmlToWebApi package
 2. Update Azure Identity (1.10.1), LINQPad and Dataverse Client (1.1.14) packages
-3. Change IQueryable prop name to CollectionSchemaName from entity's Logical name</PackageReleaseNotes>
+3. Change IQueryable prop name to handle C# keyword</PackageReleaseNotes>
     <PackageIcon>LINQPadDriver.png</PackageIcon>
     <PackageIconUrl />
     <Copyright>Natraj Yegnaraman</Copyright>
