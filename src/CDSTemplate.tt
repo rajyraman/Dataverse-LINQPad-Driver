@@ -253,7 +253,7 @@ namespace <#= this.Namespace #>
 		<# foreach (var entity in Metadata)
 		{
 		#>
-		public IQueryable<<#=this.Namespace#>.Entities.<#=entity.entityMetadata.SchemaName#>Table> <#=entity.entityMetadata.SchemaName#>
+		public IQueryable<<#=this.Namespace#>.Entities.<#=entity.entityMetadata.SchemaName#>Table> <#=entity.entityMetadata.EntitySetName#>
 		{
 			[System.Diagnostics.DebuggerNonUserCode()]
 			get

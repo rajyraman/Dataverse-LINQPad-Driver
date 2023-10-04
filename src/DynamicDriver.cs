@@ -214,7 +214,9 @@ namespace NY.Dataverse.LINQPadDriver
 
 		private static List<(EntityMetadata entityMetadata, List<(string attributeName, List<(string Label, int? Value)> options)> optionMetadata)> GetEntityMetadata(ServiceClient client)
         {
-            return (from e in client.GetAllEntityMetadata(filter: EntityFilters.Attributes | EntityFilters.Entity | EntityFilters.Relationships)
+			var metadata = client.GetAllEntityMetadata(filter: EntityFilters.Attributes | EntityFilters.Entity | EntityFilters.Relationships).ToList();
+			metadata.ForEach(entityMetadata => entityMetadata.EntitySetName = !IsCSharpKeyword(entityMetadata.SchemaName) ? entityMetadata.SchemaName : $"_{entityMetadata.SchemaName}");
+            return (from e in metadata
                     orderby e.LogicalName
                     select (entityMetadata: e, optionMetadata: (from attribute in e.Attributes.Where(a => a.AttributeType == AttributeTypeCode.State || a.AttributeType == AttributeTypeCode.Status || a.AttributeType == AttributeTypeCode.Picklist).OrderBy(a => a.LogicalName)
                                                                 let allOptions = from a in ((EnumAttributeMetadata)attribute).OptionSet.Options
